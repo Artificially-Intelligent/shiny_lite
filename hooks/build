@@ -34,4 +34,3 @@ docker build --build-arg VCS_REF=`git rev-parse --short HEAD` \
   --build-arg SOURCE_IMAGE=$SOURCE_IMAGE \
   --build-arg SOURCE_TAG=$SOURCE_TAG \
   -t $IMAGE_NAME .
-fi
