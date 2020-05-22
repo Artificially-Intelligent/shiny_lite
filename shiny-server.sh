@@ -115,8 +115,34 @@ then
 fi
 
 
+if [ -z "${INIT_DIR}" ]; then
+    echo "INIT_DIR not specified, using default value: /etc/cont-init.d/"
+    export INIT_DIR=/etc/cont-init.d/
+fi
+
+# add / to end of path if its missing
+if [[ ! $INIT_DIR == *"/" ]]; then
+    echo "changed INIT_DIR from $INIT_DIR to $INIT_DIR/"
+    export INIT_DIR=$INIT_DIR/
+fi
+
+if [ ! -d  "${INIT_DIR}" ]; then
+    echo "INIT_DIR: $INIT_DIR is not mounted. Making dir and filling with default scripts"
+    mkdir -p $INIT_DIR
+    cp /etc/shiny-server/cont-init.d-defaults/* $INIT_DIR
+fi
+
+chmod +700 -R $INIT_DIR
+
+for f in $INIT_DIR*; do
+    echo "starting $f"
+    bash "$f" -H 
+    echo "finished $f"
+done
+
 #Substitute ENV variable values into shiny-server.conf
 envsubst < /etc/shiny-server/shiny-server.conf.tmpl >  /etc/shiny-server/shiny-server.conf
+
 
 if [ "$APPLICATION_LOGS_TO_STDOUT" != "false" ];
 then
