@@ -29,6 +29,10 @@ if [[ $R_PACKAGES == "ALL" || $R_PACKAGES == *"xml2"* ]] || [[ $R_PACKAGES == *"
     echo "adding dependencies for xml2"
 fi
 if [[ $R_PACKAGES == "ALL" || $R_PACKAGES == *"zzzzz"* ]] ; then
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcurl4-gnutls-dev libcairo2-dev libxt-dev "; 
+    echo "adding dependencies for tba"
+fi
+if [[ $R_PACKAGES == "ALL" || $R_PACKAGES == *"zzzzz"* ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libsqlite3-dev "; 
     echo "adding dependencies for tba"
 fi
