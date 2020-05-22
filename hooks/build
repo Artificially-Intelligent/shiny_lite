@@ -9,10 +9,6 @@ if [ -z "${DOCKER_REPO}" ]; then
   DOCKER_REPO=`echo $IMAGE_NAME |  sed 's/:.*//'`
 fi
 
-if [ -z "${PACKAGE_LIST}" ]; then
-  PACKAGE_LIST=`echo $DOCKER_REPO | sed -n 's/^.*\///p'`
-fi
-
 if [ -z "${SOURCE_TAG}" ]; then
   SOURCE_TAG=`echo $IMAGE_NAME | sed -n 's/^.*\://p'`
 fi
