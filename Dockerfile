@@ -22,10 +22,10 @@ RUN apt-get update && apt-get install -y \
 	&& apt-get autoclean -y \
 	&& rm -rf /var/lib/apt/lists/* 
 
-COPY shiny-server.sh /usr/bin/shiny-server.sh
-COPY shiny-server.conf.tmpl /etc/shiny-server/shiny-server.conf.tmpl
-ADD cont-init.d-defaults /etc/shiny-server/
 
-RUN chmod +x /usr/bin/shiny-server.sh 
+ADD scripts /usr/local/lib/shiny-server
+
+RUN ln /usr/local/lib/shiny-server/shiny-server.sh /usr/bin/shiny-server.sh \
+	&& chmod +x /usr/bin/shiny-server.sh
 
 CMD ["/usr/bin/shiny-server.sh"]
