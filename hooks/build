@@ -2,7 +2,7 @@
 
 # $IMAGE_NAME var is injected into the build so the tag is correct. 
 
-echo "Source Branch: $SOURCE_BRANCH"
+echo "Github Source Branch: $SOURCE_BRANCH"
 echo "Image Name: $IMAGE_NAME"
 
 if [ -z "${DOCKER_REPO}" ]; then
@@ -13,10 +13,28 @@ if [ -z "${PACKAGE_LIST}" ]; then
   PACKAGE_LIST=`echo $DOCKER_REPO | sed -n 's/^.*\///p'`
 fi
 
+if [ -z "${SOURCE_TAG}" ]; then
+  SOURCE_TAG=`echo $IMAGE_NAME | sed -n 's/^.*\://p'`
+fi
+
+if [ -z "${SOURCE_IMAGE}" ]; then
+  SOURCE_IMAGE=rocker/shiny
+  echo "SOURCE_IMAGE not defined, using default value: $SOURCE_IMAGE"
+fi
+
+if [ -z "${SOURCE_TAG}" ]; then
+  SOURCE_TAG=`echo $IMAGE_NAME | sed -n 's/^.*\://p'`
+fi
+
+echo "Source Docker Image: $SOURCE_IMAGE:$SOURCE_TAG"
+
 docker build --build-arg VCS_REF=`git rev-parse --short HEAD` \
   --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
   --build-arg VERSION=0.1 \
   --build-arg DOCKER_IMAGE=$IMAGE_NAME \
   --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
   --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
+  --build-arg SOURCE_IMAGE=$SOURCE_IMAGE \
+  --build-arg SOURCE_TAG=$SOURCE_TAG \
   -t $IMAGE_NAME .
+fi
