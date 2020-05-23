@@ -22,6 +22,24 @@ if [ -z "${SOURCE_TAG}" ]; then
   SOURCE_TAG=`echo $IMAGE_NAME | sed -n 's/^.*\://p'`
 fi
 
+
+if [ -z "${PACKAGE_LIST}" ]; then
+  PACKAGE_LIST=`echo $DOCKER_REPO | sed -n 's/^.*\///p'`
+fi
+
+if [ -f "./package_lists/$PACKAGE_LIST/REQUIRED_PACKAGES.csv" ]  && [ -f "./package_lists/$PACKAGE_LIST/REQUIRED_PACKAGES_PLUS.csv" ]; then
+  printf "using $PACKAGE_LIST package lists"; 
+  if [ -z "${REQUIRED_PACKAGES}" ]; then REQUIRED_PACKAGES=`cat ./package_lists/$PACKAGE_LIST/REQUIRED_PACKAGES.csv` ; fi
+  if [ -z "${REQUIRED_PACKAGES_PLUS}" ]; then REQUIRED_PACKAGES_PLUS=`cat ./package_lists/$PACKAGE_LIST/REQUIRED_PACKAGES_PLUS.csv` ; fi
+else
+  printf "using default package lists"; 
+  if [ -z "${REQUIRED_PACKAGES}" ]; then REQUIRED_PACKAGES=`cat ./package_lists/default/REQUIRED_PACKAGES.csv` ; fi
+  if [ -z "${REQUIRED_PACKAGES_PLUS}" ]; then REQUIRED_PACKAGES_PLUS=`cat ./package_lists/default/REQUIRED_PACKAGES_PLUS.csv` ; fi
+fi
+
+echo "R Package to be installed: $REQUIRED_PACKAGES"
+echo "R Packages to be installed along with dependencies and suggestions: $REQUIRED_PACKAGES_PLUS"
+
 echo "Source Docker Image: $SOURCE_IMAGE:$SOURCE_TAG"
 
 docker build --build-arg VCS_REF=`git rev-parse --short HEAD` \
