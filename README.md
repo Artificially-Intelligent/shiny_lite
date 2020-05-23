@@ -23,9 +23,7 @@ docker create \
   -e APPLICATION_LOGS_TO_STDOUT=FALSE \
   -e DISCOVER_PACKAGES=TRUE \
   -v path/to/config_scripts:/etc/cont-init.d \
-  -v path/to/data_source:/srv/shiny-server/data \
-  -v path/to/code:/srv/shiny-server/www \
-  -v path/to/data_output:/srv/shiny-server/output \
+  -v path/to/code:/srv/shiny-server \
   -v path/to/log_output:/var/log/shiny-server \
   --restart unless-stopped \
   artificiallyintelligent/shiny_lite
@@ -54,9 +52,7 @@ services:
       - APPLICATION_LOGS_TO_STDOUT=FALSE
     volumes:
       - path/to/config_scripts:/etc/cont-init.d
-      - path/to/data_source:/srv/shiny-server/data
-      - path/to/code:/srv/shiny-server/www
-      - path/to/data_output:/srv/shiny-server/output
+      - path/to/code:/srv/shiny-server
       - path/to/log_output:/var/log/shiny-server
     ports:
       - 3838:8080
@@ -75,12 +71,9 @@ Container images are configured using parameters passed at runtime (such as thos
 | `-e PRIVILEGED=false` | Set true to run shiny-server as root user  |
 | `-e DISCOVER_PACKAGES=true` | Set true to have  *.R files in /code & /02_code directories + subdirectories scanned for library(package) entries. Missing R packages will be installed as part of container startup. |
 | `-e REQUIRED_PACKAGES=packages,to,install` | Specify a csv list of R package names to look for ensure are installed irrespective of if package discovery is on and/or finds a library() refrence for them. |
-| `-v ../data:/srv/shiny-server/data` | Placeholder folder for source data mapping. R-Shiny apps can map to this location using ../data |
-| `-e DATA_DIR=/srv/shiny-server/data` | Specify a custom location for data directory inside container. | 
-| `-v .:/srv/shiny-server/www` | The web root for shiny. R shiny code resides here. |
-| `-e WWW_DIR=/srv/shiny-server/www` | Specify a custom location for shiny www root directory inside container. | 
-| `-v ../data:/srv/shiny-server/output` | Placeholder folder for output data storage. R-Shiny apps can map to this location using ../output |
-| `-e OUTPUT_DIR=/srv/shiny-server/output` | Specify a custom location for data output directory inside container. | 
+| `-e DEPENDENCY_INSTALL=ALL` | Set ALL to have all package dependencies rules run. Dependencies will also be installed is a package matching a rule is found in REQUIRED_PACKAGES |
+| `-v .:/srv/shiny-server` | The web root for shiny. R shiny code resides here. |
+| `-e WWW_DIR=/srv/shiny-server` | Specify a custom location for shiny www root directory inside container. | 
 | `-e K_REVISION` | If set with any value container presumes Google Cloud Run Host. Disables incompatible protocols by setting SHINY_DISABLE_PROTOCOLS="websocket xdr-streaming xhr-streaming iframe-eventsource iframe-htmlfile xdr-polling iframe-xhr-polling" | 
 | `-e SHINY_DISABLE_PROTOCOLS` | If /etc/shiny-server/template-shiny-server.conf exists, passes value in shiny config via envsubst overwriting /etc/shiny-server/shiny-server.conf . Disables shiny protocols, see disable_protocols in shiny documentation for details. https://docs.rstudio.com/shiny-server/#disabling-websockets-on-the-server | 
 | `-e SHINY_APP_IDLE_TIMEOUT=5` | Specify a app_idle_timeout to use when starting shiny server. Default value is 5, boosting to 1800 helps prevent session disconnects. See app_idle_timeout in shiny documentation for details. http://docs.rstudio.com/shiny-server/#application-timeouts |

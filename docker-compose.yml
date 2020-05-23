@@ -1,0 +1,43 @@
+version: "3.0"
+
+services:
+  shiny:
+    container_name: shiny
+    # To build the image locally, comment out "image" below, and uncomment
+    # "build" and the lines indented under it.
+    # image: artificiallyintelligent/shiny_lite
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DEPENDENCY_INSTALL: ALL
+        REQUIRED_PACKAGES: "assertthat,utf8,cli,ellipsis,fansi,lifecycle,pillar,pkgconfig,vctrs,tibble,hms,clipr"
+    restart: always
+    # Setting this to something other than 'root' will cause shiny apps not to
+    # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
+    # below.
+    user: 'root'
+    # Uncomment the lines below to disable application logs STDOUT output
+    environment:
+      - DISCOVER_PACKAGES=TRUE
+      - DEPENDENCY_INSTALL=ALL
+      - SHINY_APP_IDLE_TIMEOUT=5
+      - SHINY_APP_INIT_TIMEOUT=60
+      - SHINY_GOOGLE_ANALYTICS_ID=
+      - PORT=8080
+      - APPLICATION_LOGS_TO_STDOUT=false
+    volumes:
+      - C:\Users\Stuart\GitHub\WilsonAI\jll:/srv/shiny-server
+    # environment:
+    #   - APPLICATION_LOGS_TO_STDOUT=false
+    ports:
+      - '8080:8080'
+    volumes:
+      - 'shiny_logs:/var/log/shiny-server'
+      # Comment the line below out for initial testing. With it commented out,
+      # going to localhost:80 in one's web browser will show a "Welcome to
+      # Shiny Server!" diagnostics page.
+      # - './mountpoints/apps:/srv/shiny-server'
+
+volumes:
+  shiny_logs:

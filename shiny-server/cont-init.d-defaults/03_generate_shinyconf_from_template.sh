@@ -11,11 +11,10 @@ if [ -z "${SHINY_APP_IDLE_TIMEOUT}" ]; then
 fi
 
 export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY=
-if [ !-z "${SHINY_GOOGLE_ANALYTICS_ID}" ]; then
+if [ ! -z "${SHINY_GOOGLE_ANALYTICS_ID}" ]; then
     echo "SHINY_GOOGLE_ANALYTICS_ID specified, enabling google analytics globally using id: $SHINY_GOOGLE_ANALYTICS_ID"
     export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY="google_analytics_id ${SHINY_GOOGLE_ANALYTICS_ID};"
 fi
-
 
 # if running in google cloud run disable incompatible protocols
 if [ ! -z "${K_REVISION}" ];
@@ -26,6 +25,7 @@ then
 fi
 
 #Substitute ENV variable values into template-shiny-server.conf and overwrite shiny-server.conf
-if [ -f  "/etc/shiny-server/shiny-server.conf.template" ]; then
+if [ -f  "/etc/shiny-server/template-shiny-server.conf" ]; then
+    echo "overwriting shiny-server.conf with template-shiny-server.conf and ENV variables"
     envsubst < /etc/shiny-server/template-shiny-server.conf > /etc/shiny-server/shiny-server.conf
 fi
