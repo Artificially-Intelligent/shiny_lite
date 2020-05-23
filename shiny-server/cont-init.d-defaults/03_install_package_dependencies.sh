@@ -29,15 +29,11 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"xml2"* ]] || [[ $R
     echo "adding dependencies for xml2"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcurl4-gnutls-dev libcairo2-dev libxt-dev "; 
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcairo2-dev libxt-dev "; 
     echo "adding dependencies for tba"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libsqlite3-dev "; 
-    echo "adding dependencies for tba"
-fi
-if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbd-dev "; 
     echo "adding dependencies for tba"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
@@ -56,7 +52,6 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcurl4-openssl-dev "; 
     echo "adding dependencies for tba"
 fi
-
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmagick++-dev "; 
     echo "adding dependencies for tba"
@@ -66,10 +61,21 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"shiny"* ]] ; then
     echo "adding dependencies for shiny"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"sf"* ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev libgdal-dev gdal-bin libproj-dev proj-data proj-bin libgeos-dev libmariadbclient-dev default-libmysqlclient-dev libmysqlclient-dev "; 
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev libgdal-dev gdal-bin libproj-dev proj-data proj-bin libgeos-dev default-libmysqlclient-dev libmysqlclient-dev "; 
     echo "sf"
 fi
 
+if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev libmariadb-dev libmariadbd-dev "; 
+    echo "adding dependencies for tba"
+fi
+
+## Functionally disabled due to conflicts
+if [ 1 = 2 && [ $DEPENDENCY_INSTALL == "CONFLICTS" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
+# libcurl4-gnutls-dev : Conflicts: libcurl4-openssl-dev but 7.68.0-1ubuntu2 is to be installed
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcurl4-gnutls-dev "; 
+    echo "adding dependencies for tba"
+fi
 
 if [ ! -z "${PACKAGE_DEPENDENCIES}" ] ; then
 	echo "installing package dependencies: $PACKAGE_DEPENDENCIES"

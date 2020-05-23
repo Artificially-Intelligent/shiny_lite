@@ -26,18 +26,15 @@ services:
       - SHINY_GOOGLE_ANALYTICS_ID=
       - PORT=8080
       - APPLICATION_LOGS_TO_STDOUT=false
-    volumes:
-      - C:\Users\Stuart\GitHub\WilsonAI\jll:/srv/shiny-server
-    # environment:
-    #   - APPLICATION_LOGS_TO_STDOUT=false
     ports:
       - '8080:8080'
     volumes:
-      - 'shiny_logs:/var/log/shiny-server'
-      # Comment the line below out for initial testing. With it commented out,
+      - shiny_logs:/var/log/shiny-server
+      # Comment the lines below out for initial testing. With it commented out,
       # going to localhost:80 in one's web browser will show a "Welcome to
       # Shiny Server!" diagnostics page.
       # - './mountpoints/apps:/srv/shiny-server'
+      # - ./mountpoints/apps:/etc/cont-init.d
 
 volumes:
   shiny_logs:
