@@ -33,4 +33,7 @@ docker build --build-arg VCS_REF=`git rev-parse --short HEAD` \
   --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
   --build-arg SOURCE_IMAGE=$SOURCE_IMAGE \
   --build-arg SOURCE_TAG=$SOURCE_TAG \
+  --build-arg DISCOVER_PACKAGES=$DISCOVER_PACKAGES \
+  --build-arg REQUIRED_PACKAGES=$REQUIRED_PACKAGES \
+  --build-arg DEPENDENCY_INSTALL=$DEPENDENCY_INSTALL \
   -t $IMAGE_NAME .
