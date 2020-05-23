@@ -65,10 +65,6 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"sf"* ]] ; then
     echo "sf"
 fi
 
-if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev libmariadb-dev libmariadbd-dev "; 
-    echo "adding dependencies for tba"
-fi
 
 ## Functionally disabled due to conflicts
 if [  1 == 2 ] && [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
@@ -76,6 +72,11 @@ if [  1 == 2 ] && [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzz
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcurl4-gnutls-dev "; 
     echo "adding dependencies for tba"
 fi
+if [  1 == 2 ] && [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev libmariadb-dev libmariadbd-dev "; 
+    echo "adding dependencies for tba"
+fi
+
 
 if [ ! -z "${PACKAGE_DEPENDENCIES}" ] ; then
 	echo "installing package dependencies: $PACKAGE_DEPENDENCIES"
