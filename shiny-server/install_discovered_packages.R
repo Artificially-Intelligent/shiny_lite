@@ -1,6 +1,9 @@
 list.of.packages <- c("readr","stringr")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages, quiet = TRUE)
+if(length(new.packages)){
+  print(paste('Installing packages needed for package discovery R script:', new.packages, collapse = ' '))
+  install.packages(new.packages, quiet = TRUE)
+} 
 library(readr);
 library(stringr);
 

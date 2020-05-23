@@ -71,7 +71,7 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
 fi
 
 ## Functionally disabled due to conflicts
-if [ 1 = 2 && [ $DEPENDENCY_INSTALL == "CONFLICTS" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
+if [  1 == 2 ] && [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
 # libcurl4-gnutls-dev : Conflicts: libcurl4-openssl-dev but 7.68.0-1ubuntu2 is to be installed
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcurl4-gnutls-dev "; 
     echo "adding dependencies for tba"
