@@ -1,20 +1,30 @@
-list.of.packages <- c("readr","stringr")
+list.of.packages <- c(
+  # "readr",
+  "stringr",
+  "packrat"
+)
+
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)){
   print(paste('Installing packages needed for package discovery R script:', new.packages, collapse = ' '))
   install.packages(new.packages, quiet = TRUE)
 } 
-library(readr);
+# library(readr);
 library(stringr);
 
+packrat_snapshot <- function(project = Sys.getenv('WWW_DIR')){
+  packrat::snapshot( project = project)
+}
 
 discover_and_install <- function(default_packages_csv = '/no/file/selected', discovery_directory_root = '/srv/shiny-server/www', discovery = FALSE, repos = 'https://cran.rstudio.com/'){
   
-  if(file.exists(default_packages_csv)){
-    default_packages <- unique(read_csv(default_packages_csv)[["packages"]])
-  }else{
-    default_packages <- c()
-  }
+  default_packages <- c()
+
+  # if(file.exists(default_packages_csv)){
+  #   default_packages <- unique(read_csv(default_packages_csv)[["packages"]])
+  # }else{
+  #   default_packages <- c()
+  # }
   
   if(nchar(Sys.getenv('REQUIRED_PACKAGES')) > 0){
     required_packages <- unique(str_split(Sys.getenv('REQUIRED_PACKAGES'),",")[[1]])
@@ -47,48 +57,51 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
   
   discovered_packages <- c()
   if(discovery){
-    r_files <- list.files(path = discovery_directory_root, pattern = "*.R$", recursive = TRUE,full.names = TRUE)
+    packrat::snapshot( project = Sys.getenv('WWW_DIR'))
+    # packrat_snapshot()
+
+    # r_files <- list.files(path = discovery_directory_root, pattern = "*.R$", recursive = TRUE,full.names = TRUE)
     
-    print(paste("Scanning", length(r_files), "*.R files found in code directories"))
+    # print(paste("Scanning", length(r_files), "*.R files found in code directories"))
     
-    i <- 0
-    for(file in r_files){
-      i = i + 1
-      #file <- r_files[i]
-      print(paste("Scanning", file , "(", i, "/", length(r_files), ")"))
+    # i <- 0
+    # for(file in r_files){
+    #   i = i + 1
+    #   #file <- r_files[i]
+    #   print(paste("Scanning", file , "(", i, "/", length(r_files), ")"))
       
-      lines <- read_lines(file, skip_empty_rows = TRUE)
-      if(length(lines)>0){
+    #   lines <- read_lines(file, skip_empty_rows = TRUE)
+    #   if(length(lines)>0){
         
-        # find packages referenced via library() command 
-        libraries <- gsub(' ','',lines[grepl('^library\\(',gsub(' ','',lines))])
-        libraries <- gsub("'",'',gsub('"','',gsub("\\).*","",libraries)))
-        libraries <- unlist(strsplit(libraries, split="[()]"))
-        libraries <- unique(libraries[!grepl('library|;',libraries)])
+    #     # find packages referenced via library() command 
+    #     libraries <- gsub(' ','',lines[grepl('^library\\(',gsub(' ','',lines))])
+    #     libraries <- gsub("'",'',gsub('"','',gsub("\\).*","",libraries)))
+    #     libraries <- unlist(strsplit(libraries, split="[()]"))
+    #     libraries <- unique(libraries[!grepl('library|;',libraries)])
         
-        # find packages referenced via :: command
-        libraries <- c(libraries,
-                       gsub("\\::.*","",lines[grepl('::',lines)])
-        )
+    #     # find packages referenced via :: command
+    #     libraries <- c(libraries,
+    #                    gsub("\\::.*","",lines[grepl('::',lines)])
+    #     )
         
-        # remove anything prior to a , "' character
-        libraries <- unique(
-          gsub(".*\\(","",
-               gsub(".*,","",
-                    gsub(".* ","",
-                              libraries
-                    )
-               )
-          )
-        )
-      }
+    #     # remove anything prior to a , "' character
+    #     libraries <- unique(
+    #       gsub(".*\\(","",
+    #            gsub(".*,","",
+    #                 gsub(".* ","",
+    #                           libraries
+    #                 )
+    #            )
+    #       )
+    #     )
+    #   }
       
-      if(length(libraries)>0){
-        print(paste("Packages found in", file , "(", paste(libraries, collapse = ",") , ")"))
-        discovered_packages <- unique(c(libraries,discovered_packages))
-      }
-    }
-    print(paste("Packages discovered in *.R files: (", paste(discovered_packages, collapse = ",") , ")",sep = ""))
+    #   if(length(libraries)>0){
+    #     print(paste("Packages found in", file , "(", paste(libraries, collapse = ",") , ")"))
+    #     discovered_packages <- unique(c(libraries,discovered_packages))
+    #   }
+    # }
+    # print(paste("Packages discovered in *.R files: (", paste(discovered_packages, collapse = ",") , ")",sep = ""))
   }
 
   packages_to_install <- unique(c(default_packages, required_packages, discovered_packages, prev_failed_packages))
