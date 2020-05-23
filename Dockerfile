@@ -22,8 +22,7 @@ RUN apt-get update && apt-get install -y \
 	&& apt-get autoclean -y \
 	&& rm -rf /var/lib/apt/lists/* 
 
-
-ADD scripts /usr/local/lib/shiny-server
+ADD shiny-server /usr/local/lib/shiny-server
 
 ## create directories for mounting shiny app code / data
 ARG PARENT_DIR=/srv/shiny-server
