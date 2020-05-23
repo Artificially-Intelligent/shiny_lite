@@ -76,45 +76,6 @@ else
     fi
 fi
 
-if [ -z "${APP_INIT_TIMEOUT}" ]; then
-    echo "APP_INIT_TIMEOUT not specified, shiny server run using default value: 60"
-    export APP_INIT_TIMEOUT=60
-fi
-
-if [ -z "${APP_IDLE_TIMEOUT}" ]; then
-    echo "APP_IDLE_TIMEOUT not specified, shiny server run using default value: 5"
-    export APP_IDLE_TIMEOUT=5
-fi
-
-if [ -z "${MRAN}" ];
-then
-    [ -z "$BUILD_DATE" ] && BUILD_DATE=$(TZ="America/Los_Angeles" date -I) || true \
-  	&& MRAN=https://mran.microsoft.com/snapshot/${BUILD_DATE} \
-  	&& echo MRAN=$MRAN >> /etc/environment \
-  	&& export MRAN=$MRAN
-fi
-
-echo "Installing R packages using repository: $MRAN"
-
-if [ "$DISCOVER_PACKAGES" = "true" ];
-then
-    # install packages specified by /etc/shiny-server/default_install_packages.csv or REQUIRED_PACKAGES
-    # or those discovered  by a scan of files in $WWW_DIR looking for library('packagename') entries
-	Rscript -e "source('/etc/shiny-server/install_discovered_packages.R'); discover_and_install(default_packages_csv = '/etc/shiny-server/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = TRUE,repos='$MRAN');"
-else
-    # install packages specified by /etc/shiny-server/default_install_packages.csv or REQUIRED_PACKAGES
-	Rscript -e "source('/etc/shiny-server/install_discovered_packages.R'); discover_and_install(default_packages_csv = '/etc/shiny-server/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = FALSE,repos='$MRAN');"
-fi
-
-# if running in google cloud run disable incompatible protocols
-if [ ! -z "${K_REVISION}" ];
-then
-    # remaining active protocols: jsonp-polling xhr-polling 
-    export SHINY_DISABLE_PROTOCOLS="websocket xdr-streaming xhr-streaming iframe-eventsource iframe-htmlfile xdr-polling iframe-xhr-polling"
-    echo "K_REVISION ENV Variable set with value '$K_REVISION'. Presuming Google Cloud Run Host, disabling incompatible protocols for shiny server: $SHINY_DISABLE_PROTOCOLS"
-fi
-
-
 # if [ -z "${INIT_DIR}" ]; then
 #     echo "INIT_DIR not specified, using default value: /etc/cont-init.d/"
 #     export INIT_DIR=/etc/cont-init.d/
@@ -153,9 +114,9 @@ for f in /etc/cont-init.d/*; do
     echo "finished $f"
 done
 
-#Substitute ENV variable values into shiny-server.conf
-if [ ! -f  "/etc/shiny-server/shiny-server.conf" ]; then
-    envsubst < /usr/local/lib/shiny-server/shiny-server.conf > /etc/shiny-server/shiny-server.conf
+if [ "$(ls -A /etc/shiny-server/)" ]; then
+    cp /usr/local/lib/shiny-server/default_install_packages.csv /etc/shiny-server/default_install_packages.csv
+    cp /usr/local/lib/shiny-server/template-shiny-server.conf /etc/shiny-server/template-shiny-server.conf
 fi
 
 if [ "$APPLICATION_LOGS_TO_STDOUT" != "false" ];

@@ -1,7 +1,7 @@
-# [Artificially-Intelligent/shiny](https://github.com/Artificially-Intelligent/shiny)
+# [Artificially-Intelligent/Shiny_Lite](https://github.com/Artificially-Intelligent/shiny_lite)
 
 ## Description
-rocker/r-ver docker image with a selection of packages preinstalled geared to support R-Shiny based webapps. Also come with option to install additional packages at container startup for packages refrenced by a library('package') statment within any *.R file copied/mounted into container, or specified by environment variable REQUIRED_PACKAGES.  
+rocker/shiny docker image with modified startup script that allows for more config options an the inclusion of other scripts in the container startup sequence. By default the startup scripts included include prerequistes required by several r packages.  
 
 ## Usage
 
@@ -13,14 +13,22 @@ Here are some example snippets to help you get started creating a container.
 docker create \
   --name=myshinyapp \
   -p 8080:8080 \
-  -e DISCOVER_PACKAGES=true \
-  -e REQUIRED_PACKAGES=shiny,readr \
+  -e R_PACKAGES=ALL \
   -e SHINYCODE_GITHUB_REPO=https://github.com/rstudio/shiny-examples \
-  -v path/to/data_source:/01_input \
-  -v path/to/code:/02_code \
-  -v path/to/data_output:/04_output \
+  -e PORT=8080 \
+  -e APP_INIT_TIMEOUT=60 \
+  -e APP_IDLE_TIMEOUT=5 \
+  -e SHINY_DISABLE_PROTOCOLS="websocket xdr-streaming xhr-streaming iframe-eventsource iframe-htmlfile xdr-polling iframe-xhr-polling" \
+  -e MRAN=https://mran.microsoft.com/snapshot/2020-05-22 \
+  -e APPLICATION_LOGS_TO_STDOUT=FALSE \
+  -e DISCOVER_PACKAGES=TRUE \
+  -v path/to/config_scripts:/etc/cont-init.d \
+  -v path/to/data_source:/srv/shiny-server/data \
+  -v path/to/code:/srv/shiny-server/www \
+  -v path/to/data_output:/srv/shiny-server/output \
+  -v path/to/log_output:/var/log/shiny-server \
   --restart unless-stopped \
-  artificiallyintelligent/shiny
+  artificiallyintelligent/shiny_lite
 ```
 
 ## docker-compose
@@ -32,7 +40,7 @@ Compatible with docker-compose v2 schemas.
 version: "2"
 services:
   shiny:
-    image: artificiallyintelligent/shiny
+    image: artificiallyintelligent/shiny_lite
     container_name: myshinyapp
     environment:
       - DISCOVER_PACKAGES=true
@@ -40,10 +48,15 @@ services:
       - APP_INIT_TIMEOUT=60
       - PORT=8080
       - SHINYCODE_GITHUB_REPO=https://github.com/rstudio/shiny-examples
+      - K_REVISION=set_any_value
+      - MRAN=https://mran.microsoft.com/snapshot/2020-05-22
+      - APPLICATION_LOGS_TO_STDOUT=FALSE
     volumes:
+      - path/to/config_scripts:/etc/cont-init.d
       - path/to/data_source:/srv/shiny-server/data
       - path/to/code:/srv/shiny-server/www
       - path/to/data_output:/srv/shiny-server/output
+      - path/to/log_output:/var/log/shiny-server
     ports:
       - 3838:8080
     restart: unless-stopped
@@ -67,15 +80,12 @@ Container images are configured using parameters passed at runtime (such as thos
 | `-e WWW_DIR=/srv/shiny-server/www` | Specify a custom location for shiny www root directory inside container. | 
 | `-v ../data:/srv/shiny-server/output` | Placeholder folder for output data storage. R-Shiny apps can map to this location using ../output |
 | `-e OUTPUT_DIR=/srv/shiny-server/output` | Specify a custom location for data output directory inside container. | 
-| `-e APP_IDLE_TIMEOUT=5` | Specify a app_idle_timeout to use when starting shiny server. Default value is 5, boosting to 1800 helps prevent session disconnects |
-| `-e APP_INIT_TIMEOUT=60` | Specify a app_init_timeout to use when starting shiny server. Default value is 60, boosting to 1800 helps prevent session disconnects | 
+| `-e K_REVISION` | If set with any value container presumes Google Cloud Run Host. Disables incompatible protocols by setting SHINY_DISABLE_PROTOCOLS="websocket xdr-streaming xhr-streaming iframe-eventsource iframe-htmlfile xdr-polling iframe-xhr-polling" | 
+| `-e SHINY_DISABLE_PROTOCOLS` | If /etc/shiny-server/template-shiny-server.conf exists, passes value in shiny config via envsubst overwriting /etc/shiny-server/shiny-server.conf . Disables shiny protocols, see disable_protocols in shiny documentation for details. https://docs.rstudio.com/shiny-server/#local-app-configurations | 
+| `-e APP_IDLE_TIMEOUT=5` | Specify a app_idle_timeout to use when starting shiny server. Default value is 5, boosting to 1800 helps prevent session disconnects. See app_idle_timeout in shiny documentation for details. https://docs.rstudio.com/shiny-server/#local-app-configurations |
+| `-e APP_INIT_TIMEOUT=60` | Specify a app_init_timeout to use when starting shiny server. Default value is 60, boosting to 1800 helps prevent session disconnects. See app_init_timeout in shiny documentation for details. https://docs.rstudio.com/shiny-server/#local-app-configurations | 
 
 ## Preinstalled Packages
-### Packages plus suggested dependencies
-tidyverse,dplyr,devtools,formatR,remotes,selectr,caTools,BiocManager
-
-### Packages plus required dependencies
-purrr,rattle,dotenv,magrittr,DataExplorer,aws.s3,DBI,httr,pool,readr,readxl,RMySQL,slackr,writexl,DT,dygraphs,formattable,highcharter,plotly,rmarkdown,scales,skimr,styler,timevis,tmaptools,data.table,forcats,glue,janitor,jsonlite,lubridate,magick,sf,summarytools,tibbletime,wkb,xts,protolite,V8,jqr,geojson,geojsonio,auth0,googleAuthR,leaflet,leaflet.extras,shiny,shinyAce,shinycssloaders,shinycssloaders,shinydashboard,shinydashboardPlus,shinyEffects,shinyjqui,shinyjs,shinyWidgets
 
 ## Deploying to Google Cloud Run
 Look at instructions here for the general process of how to:

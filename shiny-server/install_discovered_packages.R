@@ -39,7 +39,7 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
   }
 
  # default_packages_csv_path <- strsplit(default_packages_csv, "/")
-#  default_packages_csv_filename <- default_packages_csv_path[[1]][length(default_packages_csv_path[[1]])]
+ # default_packages_csv_filename <- default_packages_csv_path[[1]][length(default_packages_csv_path[[1]])]
  # installed_packages_csv <- sub(default_packages_csv_filename,'installed_packages.csv',default_packages_csv)
   
   discovered_packages <- c()
