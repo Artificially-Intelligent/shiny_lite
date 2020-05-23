@@ -2,12 +2,20 @@
 
 if [ -z "${SHINY_APP_INIT_TIMEOUT}" ]; then
     echo "SHINY_APP_INIT_TIMEOUT not specified, shiny server run using default value: 60"
-    export SHINY_APP_INIT_TIMEOUT=60
+    if [ -z "${APP_INIT_TIMEOUT}" ]; then
+        export SHINY_APP_INIT_TIMEOUT=60
+    else
+        export SHINY_APP_INIT_TIMEOUT=$APP_INIT_TIMEOUT
+    fi
 fi
 
 if [ -z "${SHINY_APP_IDLE_TIMEOUT}" ]; then
     echo "SHINY_APP_IDLE_TIMEOUT not specified, shiny server run using default value: 5"
-    export SHINY_APP_IDLE_TIMEOUT=5
+    if [ -z "${APP_IDLE_TIMEOUT}" ]; then
+        export SHINY_APP_IDLE_TIMEOUT=5
+    else
+        export SHINY_APP_IDLE_TIMEOUT=$APP_IDLE_TIMEOUT
+    fi
 fi
 
 export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY=
