@@ -1,19 +1,21 @@
 #!/bin/bash 
 
-if [ -z "${APP_INIT_TIMEOUT}" ]; then
-    echo "APP_INIT_TIMEOUT not specified, shiny server run using default value: 60"
-    export APP_INIT_TIMEOUT=60
+if [ -z "${SHINY_APP_INIT_TIMEOUT}" ]; then
+    echo "SHINY_APP_INIT_TIMEOUT not specified, shiny server run using default value: 60"
+    export SHINY_APP_INIT_TIMEOUT=60
 fi
 
-if [ -z "${APP_IDLE_TIMEOUT}" ]; then
-    echo "APP_IDLE_TIMEOUT not specified, shiny server run using default value: 5"
-    export APP_IDLE_TIMEOUT=5
+if [ -z "${SHINY_APP_IDLE_TIMEOUT}" ]; then
+    echo "SHINY_APP_IDLE_TIMEOUT not specified, shiny server run using default value: 5"
+    export SHINY_APP_IDLE_TIMEOUT=5
 fi
 
-if [ -z "${APP_SESSION_TIMEOUT}" ]; then
-    echo "APP_SESSION_TIMEOUT not specified, shiny server run using default value: 5"
-    export APP_SESSION_TIMEOUT=0
+export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY=
+if [ !-z "${SHINY_GOOGLE_ANALYTICS_ID}" ]; then
+    echo "SHINY_GOOGLE_ANALYTICS_ID specified, enabling google analytics globally using id: $SHINY_GOOGLE_ANALYTICS_ID"
+    export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY="google_analytics_id ${SHINY_GOOGLE_ANALYTICS_ID};"
 fi
+
 
 # if running in google cloud run disable incompatible protocols
 if [ ! -z "${K_REVISION}" ];

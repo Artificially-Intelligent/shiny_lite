@@ -13,12 +13,12 @@ Here are some example snippets to help you get started creating a container.
 docker create \
   --name=myshinyapp \
   -p 8080:8080 \
-  -e R_PACKAGES=ALL \
   -e SHINYCODE_GITHUB_REPO=https://github.com/rstudio/shiny-examples \
   -e PORT=8080 \
-  -e APP_INIT_TIMEOUT=60 \
-  -e APP_IDLE_TIMEOUT=5 \
+  -e SHINY_APP_INIT_TIMEOUT=60 \
+  -e SHINY_APP_IDLE_TIMEOUT=5 \
   -e SHINY_DISABLE_PROTOCOLS="websocket xdr-streaming xhr-streaming iframe-eventsource iframe-htmlfile xdr-polling iframe-xhr-polling" \
+  -e SHINY_GOOGLE_ANALYTICS_ID="UA-12345-1" \
   -e MRAN=https://mran.microsoft.com/snapshot/2020-05-22 \
   -e APPLICATION_LOGS_TO_STDOUT=FALSE \
   -e DISCOVER_PACKAGES=TRUE \
@@ -44,8 +44,9 @@ services:
     container_name: myshinyapp
     environment:
       - DISCOVER_PACKAGES=true
-      - APP_IDLE_TIMEOUT=5
-      - APP_INIT_TIMEOUT=60
+      - SHINY_APP_IDLE_TIMEOUT=5
+      - SHINY_APP_INIT_TIMEOUT=60
+      - SHINY_GOOGLE_ANALYTICS_ID="UA-12345-1"
       - PORT=8080
       - SHINYCODE_GITHUB_REPO=https://github.com/rstudio/shiny-examples
       - K_REVISION=set_any_value
@@ -81,9 +82,10 @@ Container images are configured using parameters passed at runtime (such as thos
 | `-v ../data:/srv/shiny-server/output` | Placeholder folder for output data storage. R-Shiny apps can map to this location using ../output |
 | `-e OUTPUT_DIR=/srv/shiny-server/output` | Specify a custom location for data output directory inside container. | 
 | `-e K_REVISION` | If set with any value container presumes Google Cloud Run Host. Disables incompatible protocols by setting SHINY_DISABLE_PROTOCOLS="websocket xdr-streaming xhr-streaming iframe-eventsource iframe-htmlfile xdr-polling iframe-xhr-polling" | 
-| `-e SHINY_DISABLE_PROTOCOLS` | If /etc/shiny-server/template-shiny-server.conf exists, passes value in shiny config via envsubst overwriting /etc/shiny-server/shiny-server.conf . Disables shiny protocols, see disable_protocols in shiny documentation for details. https://docs.rstudio.com/shiny-server/#local-app-configurations | 
-| `-e APP_IDLE_TIMEOUT=5` | Specify a app_idle_timeout to use when starting shiny server. Default value is 5, boosting to 1800 helps prevent session disconnects. See app_idle_timeout in shiny documentation for details. https://docs.rstudio.com/shiny-server/#local-app-configurations |
-| `-e APP_INIT_TIMEOUT=60` | Specify a app_init_timeout to use when starting shiny server. Default value is 60, boosting to 1800 helps prevent session disconnects. See app_init_timeout in shiny documentation for details. https://docs.rstudio.com/shiny-server/#local-app-configurations | 
+| `-e SHINY_DISABLE_PROTOCOLS` | If /etc/shiny-server/template-shiny-server.conf exists, passes value in shiny config via envsubst overwriting /etc/shiny-server/shiny-server.conf . Disables shiny protocols, see disable_protocols in shiny documentation for details. https://docs.rstudio.com/shiny-server/#disabling-websockets-on-the-server | 
+| `-e SHINY_APP_IDLE_TIMEOUT=5` | Specify a app_idle_timeout to use when starting shiny server. Default value is 5, boosting to 1800 helps prevent session disconnects. See app_idle_timeout in shiny documentation for details. http://docs.rstudio.com/shiny-server/#application-timeouts |
+| `-e SHINY_APP_INIT_TIMEOUT=60` | Specify a app_init_timeout to use when starting shiny server. Default value is 60, boosting to 1800 helps prevent session disconnects. See app_init_timeout in shiny documentation for details. http://docs.rstudio.com/shiny-server/#application-timeouts |
+| `-e SHINY_GOOGLE_ANALYTICS_ID=UA-12345-1` | Specify a google_analytics_id for shiny to enable Google Analytics tracking globally. See app_init_timeout in shiny documentation for details. https://docs.rstudio.com/shiny-server/#google-analytics |
 
 ## Preinstalled Packages
 
