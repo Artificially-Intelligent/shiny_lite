@@ -65,7 +65,7 @@ RUN chmod +x ${LIB_DIR}/cont-init.d-defaults/* \
 	&& ${LIB_DIR}/cont-init.d-defaults/04_install_packages.sh
 
 ## start shiny server
-RUN ln ${LIB_DIR}/shiny-server.sh /usr/bin/shiny-server.sh \
+RUN ln -f ${LIB_DIR}/shiny-server.sh /usr/bin/shiny-server.sh \
 	&& chmod +x /usr/bin/shiny-server.sh
 
 CMD ["/usr/bin/shiny-server.sh"]
