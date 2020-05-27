@@ -1,5 +1,10 @@
 #!/bin/bash 
 
+if [[ $1 == "--all" ]] ; then  
+    DEPENDENCY_INSTALL="ALL" 
+fi
+
+
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"protolite"* ]] ; then  
     PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libprotobuf-dev protobuf-compiler "
     echo "adding dependencies for protolite"
@@ -61,7 +66,7 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"shiny"* ]] ; then
     echo "adding dependencies for shiny"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"sf"* ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev libgdal-dev gdal-bin libproj-dev proj-data proj-bin libgeos-dev default-libmysqlclient-dev libmysqlclient-dev "; 
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev libgdal-dev gdal-bin libproj-dev proj-data proj-bin libgeos-dev default-libmysqlclient-dev libmariadb-dev-compat"; 
     echo "sf"
 fi
 
