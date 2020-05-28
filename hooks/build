@@ -40,11 +40,11 @@ echo "Source Docker Image: $SOURCE_IMAGE:$SOURCE_TAG"
 docker build --build-arg VCS_REF=`git rev-parse --short HEAD` \
   --build-arg VERSION=0.1 \
   --build-arg DOCKER_IMAGE=$IMAGE_NAME \
-  --build-arg SOURCE_REPO=$SOURCE_REPO \
-  --build-arg SOURCE_BRANCH=$SOURCE_BRANCH \
-  --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
-  --build-arg SOURCE_IMAGE=$SOURCE_IMAGE \
-  --build-arg SOURCE_TAG=$SOURCE_TAG \
+  --build-arg SRC_REPO=$SOURCE_REPO \
+  --build-arg SRC_BRANCH=$SOURCE_BRANCH \
+  --build-arg SRC_COMMIT=$SOURCE_COMMIT \
+  --build-arg SRC_IMAGE=$SOURCE_IMAGE \
+  --build-arg SRC_TAG=$SOURCE_TAG \
   --build-arg DISCOVERY=$DISCOVER_PACKAGES \
   --build-arg PACKAGES=$REQUIRED_PACKAGES \
   --build-arg PACKAGES_PLUS=$REQUIRED_PACKAGES_PLUS \

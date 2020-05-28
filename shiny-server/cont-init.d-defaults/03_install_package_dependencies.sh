@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-if [[ $1 == "--all" ]] ; then  
+if [[ $1 == "--all" || $DEPENDENCY_INSTALL == "ALL" || $DEPENDENCY_INSTALL == "TRUE" || $DEPENDENCY_INSTALL == "true" || $DEPENDENCY_INSTALL == "1" ]] ; then
     DEPENDENCY_INSTALL="ALL" 
 fi
 
@@ -66,23 +66,22 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"shiny"* ]] && [[ $
     echo "adding dependencies for shiny"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"mongolite"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES llibsasl2-dev "; 
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libsasl2-dev "; 
     echo "adding dependencies for mongolite"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"sf"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev libgdal-dev gdal-bin libproj-dev proj-data proj-bin libgeos-dev default-libmysqlclient-dev libmariadb-dev-compat"; 
     echo "sf"
 fi
-
+if [[ $DEPENDENCY_INSTALL == "ALL_CONFLICT" || $REQUIRED_PACKAGES == *"RMySQL"* ]]  && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev "; 
+    echo "adding dependencies for RMySQL"
+fi
 
 ## Functionally disabled due to conflicts
 if [  1 == 2 ] && [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
 # libcurl4-gnutls-dev : Conflicts: libcurl4-openssl-dev but 7.68.0-1ubuntu2 is to be installed
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcurl4-gnutls-dev "; 
-    echo "adding dependencies for tba"
-fi
-if [  1 == 2 ] && [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"zzzzz"* ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev libmariadb-dev libmariadbd-dev "; 
     echo "adding dependencies for tba"
 fi
 
@@ -92,12 +91,12 @@ if [ ! -z "${PACKAGE_DEPENDENCIES}" ] ; then
 	apt-get update -qq && apt-get -y --no-install-recommends install $PACKAGE_DEPENDENCIES
 
 	## clean up install files
-	cd /
-	rm -rf /tmp/*
-	apt-get remove --purge -y $BUILDDEPS
-	apt-get autoremove -y
-	apt-get autoclean -y
-	rm -rf /var/lib/apt/lists/* 
+	# cd /
+	# rm -rf /tmp/*
+	# apt-get remove --purge -y $BUILDDEPS
+	# apt-get autoremove -y
+	# apt-get autoclean -y
+	# rm -rf /var/lib/apt/lists/* 
 else
 	echo "DEPENDENCY_INSTALL != TRUE and REQUIRED_PACKAGES had no packages matching rules so no package dependecies were installed."
 fi

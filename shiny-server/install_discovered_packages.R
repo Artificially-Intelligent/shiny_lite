@@ -123,6 +123,7 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
                              # repos = repos, 
                         #     method='wget',
                              quiet = TRUE)
+            warnings()
             #write.table(package_name, file=installed_packages_csv, row.names=FALSE, col.names=FALSE, sep=",", append = TRUE)
           }else{
             print(paste("Skipping previously installed package: ", package_name ,sep = ""))
