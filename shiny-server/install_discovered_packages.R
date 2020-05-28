@@ -58,12 +58,11 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
  # default_packages_csv_path <- strsplit(default_packages_csv, "/")
  # default_packages_csv_filename <- default_packages_csv_path[[1]][length(default_packages_csv_path[[1]])]
  # installed_packages_csv <- sub(default_packages_csv_filename,'installed_packages.csv',default_packages_csv)
- packrat_snapshot()  
   discovered_packages <- c()
   if(discovery){
+    print("Runnning package discovery")
     packrat::snapshot( project = Sys.getenv('WWW_DIR'))
-    # packrat_snapshot()
-
+    
     # r_files <- list.files(path = discovery_directory_root, pattern = "*.R$", recursive = TRUE,full.names = TRUE)
     
     # print(paste("Scanning", length(r_files), "*.R files found in code directories"))
