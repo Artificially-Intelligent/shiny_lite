@@ -17,6 +17,10 @@ packrat_snapshot <- function(project = Sys.getenv('WWW_DIR')){
 }
 
 discover_and_install <- function(default_packages_csv = '/no/file/selected', discovery_directory_root = '/srv/shiny-server/www', discovery = FALSE, repos = 'https://cran.rstudio.com/'){
+
+  oldRepos <- getOption("repos")
+  options(repos = c( MRAN = repos, oldRepos))
+  print(paste("Package Repos:", paste(getOption("repos"), collapse = ",")))
   
   default_packages <- c()
 
@@ -54,7 +58,7 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
  # default_packages_csv_path <- strsplit(default_packages_csv, "/")
  # default_packages_csv_filename <- default_packages_csv_path[[1]][length(default_packages_csv_path[[1]])]
  # installed_packages_csv <- sub(default_packages_csv_filename,'installed_packages.csv',default_packages_csv)
-  
+ packrat_snapshot()  
   discovered_packages <- c()
   if(discovery){
     packrat::snapshot( project = Sys.getenv('WWW_DIR'))
@@ -117,7 +121,7 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
             print(paste("Installing package: ", package_name ,sep = ""))
             install.packages(package_name, 
                              dependencies = TRUE,
-                             repos = repos, 
+                             # repos = repos, 
                         #     method='wget',
                              quiet = TRUE)
             #write.table(package_name, file=installed_packages_csv, row.names=FALSE, col.names=FALSE, sep=",", append = TRUE)
