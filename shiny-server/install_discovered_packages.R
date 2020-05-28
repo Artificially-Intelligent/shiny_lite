@@ -1,5 +1,5 @@
 list.of.packages <- c(
-  # "readr",
+  "readr",
   "stringr",
   "packrat"
 )
@@ -9,7 +9,7 @@ if(length(new.packages)){
   print(paste('Installing packages needed for package discovery R script:', new.packages, collapse = ' '))
   install.packages(new.packages, quiet = TRUE)
 } 
-# library(readr);
+library(readr);
 library(stringr);
 
 packrat_snapshot <- function(project = Sys.getenv('WWW_DIR')){
@@ -24,11 +24,11 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
   
   default_packages <- c()
 
-  # if(file.exists(default_packages_csv)){
-  #   default_packages <- unique(read_csv(default_packages_csv)[["packages"]])
-  # }else{
-  #   default_packages <- c()
-  # }
+  if(file.exists(default_packages_csv)){
+    default_packages <- unique(read_csv(default_packages_csv)[["packages"]])
+  }else{
+    default_packages <- c()
+  }
   
   if(nchar(Sys.getenv('REQUIRED_PACKAGES')) > 0){
     required_packages <- unique(str_split(Sys.getenv('REQUIRED_PACKAGES'),",")[[1]])
