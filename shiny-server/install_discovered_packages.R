@@ -25,7 +25,7 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
   default_packages <- c()
 
   if(file.exists(default_packages_csv)){
-    default_packages <- unique(read_csv(default_packages_csv)[["packages"]])
+    default_packages <- unique(str_split(paste(read.csv2("packages.csv",header = FALSE, as.is = TRUE, row.names = NULL, sep = ","), collapse = ","),",")[[1]])
   }else{
     default_packages <- c()
   }
@@ -61,50 +61,50 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected', dis
   discovered_packages <- c()
   if(discovery){
     print("Runnning package discovery")
-    packrat::snapshot( project = Sys.getenv('WWW_DIR'))
+    # packrat::snapshot( project = Sys.getenv('WWW_DIR'))
     
-    # r_files <- list.files(path = discovery_directory_root, pattern = "*.R$", recursive = TRUE,full.names = TRUE)
-    
-    # print(paste("Scanning", length(r_files), "*.R files found in code directories"))
-    
-    # i <- 0
-    # for(file in r_files){
-    #   i = i + 1
-    #   #file <- r_files[i]
-    #   print(paste("Scanning", file , "(", i, "/", length(r_files), ")"))
-      
-    #   lines <- read_lines(file, skip_empty_rows = TRUE)
-    #   if(length(lines)>0){
-        
-    #     # find packages referenced via library() command 
-    #     libraries <- gsub(' ','',lines[grepl('^library\\(',gsub(' ','',lines))])
-    #     libraries <- gsub("'",'',gsub('"','',gsub("\\).*","",libraries)))
-    #     libraries <- unlist(strsplit(libraries, split="[()]"))
-    #     libraries <- unique(libraries[!grepl('library|;',libraries)])
-        
-    #     # find packages referenced via :: command
-    #     libraries <- c(libraries,
-    #                    gsub("\\::.*","",lines[grepl('::',lines)])
-    #     )
-        
-    #     # remove anything prior to a , "' character
-    #     libraries <- unique(
-    #       gsub(".*\\(","",
-    #            gsub(".*,","",
-    #                 gsub(".* ","",
-    #                           libraries
-    #                 )
-    #            )
-    #       )
-    #     )
-    #   }
-      
-    #   if(length(libraries)>0){
-    #     print(paste("Packages found in", file , "(", paste(libraries, collapse = ",") , ")"))
-    #     discovered_packages <- unique(c(libraries,discovered_packages))
-    #   }
-    # }
-    # print(paste("Packages discovered in *.R files: (", paste(discovered_packages, collapse = ",") , ")",sep = ""))
+    r_files <- list.files(path = discovery_directory_root, pattern = "*.R$", recursive = TRUE,full.names = TRUE)
+
+    print(paste("Scanning", length(r_files), "*.R files found in code directories"))
+
+    i <- 0
+    for(file in r_files){
+      i = i + 1
+      #file <- r_files[i]
+      print(paste("Scanning", file , "(", i, "/", length(r_files), ")"))
+
+      lines <- read_lines(file, skip_empty_rows = TRUE)
+      if(length(lines)>0){
+
+        # find packages referenced via library() command
+        libraries <- gsub(' ','',lines[grepl('^library\\(',gsub(' ','',lines))])
+        libraries <- gsub("'",'',gsub('"','',gsub("\\).*","",libraries)))
+        libraries <- unlist(strsplit(libraries, split="[()]"))
+        libraries <- unique(libraries[!grepl('library|;',libraries)])
+
+        # find packages referenced via :: command
+        libraries <- c(libraries,
+                       gsub("\\::.*","",lines[grepl('::',lines)])
+        )
+
+        # remove anything prior to a , "' character
+        libraries <- unique(
+          gsub(".*\\(","",
+               gsub(".*,","",
+                    gsub(".* ","",
+                              libraries
+                    )
+               )
+          )
+        )
+      }
+
+      if(length(libraries)>0){
+        print(paste("Packages found in", file , "(", paste(libraries, collapse = ",") , ")"))
+        discovered_packages <- unique(c(libraries,discovered_packages))
+      }
+    }
+    print(paste("Packages discovered in *.R files: (", paste(discovered_packages, collapse = ",") , ")",sep = ""))
   }
 
   packages_to_install <- unique(c(default_packages, required_packages, discovered_packages, prev_failed_packages))

@@ -1,9 +1,10 @@
 #!/bin/bash 
 
-if [[ $1 == "--all" ]] ; then  
-    DEPENDENCY_INSTALL="ALL" 
+# Check for variations of true
+if [[ $1 == "--all" || $DEPENDENCY_INSTALL == "ALL" || $DEPENDENCY_INSTALL == "TRUE" || $DEPENDENCY_INSTALL == "true" $DEPENDENCY_INSTALL == "1" ]] ; then  
+     DEPENDENCY_INSTALL="ALL" 
+    echo "adding ALL dependencies"
 fi
-
 
 if [[ $DEPENDENCY_INSTALL == "ALL" || $REQUIRED_PACKAGES == *"protolite"* ]] ; then  
     PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libprotobuf-dev protobuf-compiler "

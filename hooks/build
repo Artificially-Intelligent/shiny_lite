@@ -22,7 +22,6 @@ if [ -z "${SOURCE_TAG}" ]; then
   SOURCE_TAG=`echo $IMAGE_NAME | sed -n 's/^.*\://p'`
 fi
 
-
 if [ -z "${PACKAGE_LIST}" ]; then
   PACKAGE_LIST=`echo $DOCKER_REPO | sed -n 's/^.*\///p'`
 fi
@@ -46,7 +45,8 @@ docker build --build-arg VCS_REF=`git rev-parse --short HEAD` \
   --build-arg SOURCE_COMMIT=$SOURCE_COMMIT \
   --build-arg SOURCE_IMAGE=$SOURCE_IMAGE \
   --build-arg SOURCE_TAG=$SOURCE_TAG \
-  --build-arg DISCOVER_PACKAGES=$DISCOVER_PACKAGES \
-  --build-arg REQUIRED_PACKAGES=$REQUIRED_PACKAGES \
-  --build-arg DEPENDENCY_INSTALL=$DEPENDENCY_INSTALL \
+  --build-arg DISCOVERY=$DISCOVER_PACKAGES \
+  --build-arg PACKAGES=$REQUIRED_PACKAGES \
+  --build-arg PACKAGES_PLUS=$REQUIRED_PACKAGES_PLUS \
+  --build-arg DEPENDENCY=$DEPENDENCY_INSTALL \
   -t $IMAGE_NAME .

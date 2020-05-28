@@ -30,37 +30,31 @@ RUN apt-get update && apt-get install -y \
 ADD shiny-server /usr/local/lib/shiny-server
 
 ## create directories for mounting shiny app code / data
-ARG PARENT_DIR=/srv/shiny-server
-ARG WWW_DIR=${PARENT_DIR}
-# ARG DATA_DIR=${PARENT_DIR}/data
-# ARG WWW_DIR=${PARENT_DIR}/www
-# ARG TEMP_DIR=${PARENT_DIR}/staging
-# ARG OUTPUT_DIR=${PARENT_DIR}/output
-ARG LOG_DIR=/var/log/shiny-server
 
-RUN rm -r $PARENT_DIR \
-	&& rm /etc/shiny-server/* \
-	&& mkdir -p $PARENT_DIR \
- 	&& mkdir -p $WWW_DIR \
- 	&& mkdir -p $LOG_DIR \
-	&& chown $PUID.$PGID -R $PARENT_DIR
-
-
-ENV WWW_DIR ${WWW_DIR}
-ENV LOG_DIR ${LOG_DIR} 
+ARG SHINY_DIR=/srv/shiny-server
+ENV WWW_DIR ${SHINY_DIR}
+ENV LOG_DIR /var/log/shiny-server
 ENV LIB_DIR=/usr/local/lib/shiny-server
 
+RUN rm -r $SHINY_DIR \
+	&& rm /etc/shiny-server/* \
+	&& mkdir -p $WWW_DIR \
+ 	&& mkdir -p $LOG_DIR \
+	&& chown $PUID.$PGID -R $SHINY_DIR
 
 ## install package dependcies
-ARG DISCOVER_PACKAGES=FALSE
-ARG REQUIRED_PACKAGES=
-ARG REQUIRED_PACKAGES_PLUS=
-ARG DEPENDENCY_INSTALL=
+# DISCOVERY=TRUE to try and discover packages required you code in $WWW_DIR
+ARG DISCOVERY=FALSE
+# CSV list of packages
+ARG PACKAGES=
+ARG PACKAGES_PLUS=
+# DEPENDENCY=TRUE to install all know package dependcies 
+ARG DEPENDENCY=
 
-ENV DISCOVER_PACKAGES ${DISCOVER_PACKAGES}
-ENV REQUIRED_PACKAGES ${REQUIRED_PACKAGES}
-ENV REQUIRED_PACKAGES_PLUS ${REQUIRED_PACKAGES_PLUS}
-ENV DEPENDENCY_INSTALL ${DEPENDENCY_INSTALL}
+ENV DISCOVER_PACKAGES ${DISCOVER}
+ENV REQUIRED_PACKAGES ${PACKAGES}
+ENV REQUIRED_PACKAGES_PLUS ${PACKAGES_PLUS}
+ENV DEPENDENCY_INSTALL ${DEPENDENCY}
 
 RUN chmod +x ${LIB_DIR}/cont-init.d-defaults/* \ 
 	&& ${LIB_DIR}/cont-init.d-defaults/03_install_package_dependencies.sh \
