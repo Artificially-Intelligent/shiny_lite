@@ -1,18 +1,15 @@
 # Base image https://hub.docker.com/u/rocker/
 ARG SRC_TAG=latest
-ARG SRC_IMAGE=rocker/shiny
+ARG SRC_IMAGE=rocker/r-ver
 FROM $SRC_IMAGE:$SRC_TAG
 
-ARG $SRC_REPO
-ARG $SRC_BRANCH
-ARG $SRC_COMMIT
-
-ENV SOURCE_DOCKER_IMAGE=$SRC_IMAGE:$SRC_TAG
-ENV SOURCE_REPO=$SRC_REPO
-ENV SOURCE_BRANCH=$SRC_BRANCH
-ENV SOURCE_COMMIT=$SRC_COMMIT
-
 RUN apt-get update && apt-get install -y \
+    sudo \
+    gdebi-core \
+    pandoc \
+    pandoc-citeproc \
+    libcurl4-gnutls-dev \
+    libcairo2-dev \
     libxt-dev \
     xtail \
     wget \
@@ -27,10 +24,60 @@ RUN apt-get update && apt-get install -y \
 	&& apt-get autoclean -y \
 	&& rm -rf /var/lib/apt/lists/* 
 
+# Download and install shiny server
+RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION -O "version.txt" && \
+    VERSION=$(cat version.txt)  && \
+    wget --no-verbose "https://download3.rstudio.org/ubuntu-14.04/x86_64/shiny-server-$VERSION-amd64.deb" -O ss-latest.deb && \
+    gdebi -n ss-latest.deb && \
+    rm -f version.txt ss-latest.deb && \
+    . /etc/environment && \
+    R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN')" && \
+    chown shiny:shiny /var/lib/shiny-server \
+	## clean up install files
+	&& cd / \
+	&& rm -rf /tmp/* \
+	&& apt-get remove --purge -y $BUILDDEPS \
+	&& apt-get autoremove -y \
+	&& apt-get autoclean -y \
+	&& rm -rf /var/lib/apt/lists/* 
+
+# Download and install R packages and suggested dependencies from csv ENV variable REQUIRED_PACKAGES_PLUS
+RUN install2.r \
+	--error \
+    --deps TRUE \
+    --skipinstalled \
+	--ncpus -1 \
+	shiny \
+	rmarkdown \
+	remotes \
+#	`echo $REQUIRED_PACKAGES_PLUS |  sed 's/,/ /g'` \
+	&& rm -rf /tmp/*
+
+
+ARG BLD_DATE
+ARG VERSION=0.x.x
+ARG MAINTAINER=slink42
+ARG $SRC_REPO
+ARG $SRC_BRANCH
+ARG $SRC_COMMIT
+ARG $DEST_IMAGE
+
+ENV SOURCE_DOCKER_IMAGE=$SRC_IMAGE:$SRC_TAG
+ENV SOURCE_REPO=${$SRC_REPO}
+ENV SOURCE_BRANCH=${$SRC_BRANCH}
+ENV SOURCE_COMMIT=${$SRC_COMMIT}
+ENV DOCKER_IMAGE=${$DEST_IMAGE}
+ENV BUILD_DATE=${BLD_DATE}
+
+# add image labels
+LABEL build_version="$DOCKER_IMAGE version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL build_source="$SOURCE_BRANCH - https://github.com/Artificially-Intelligent/shiny_lite/commit/${SOURCE_COMMIT}"
+LABEL maintainer="$MAINTAINER"
+
+# add shiny server custom scripts
 ADD shiny-server /usr/local/lib/shiny-server
 
-## create directories for mounting shiny app code / data
-
+## create directories for mounting shiny app code
 ARG SHINY_DIR=/srv/shiny-server
 ENV WWW_DIR ${SHINY_DIR}
 ENV LOG_DIR /var/log/shiny-server

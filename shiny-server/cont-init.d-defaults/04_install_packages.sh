@@ -14,11 +14,13 @@ fi
     echo "REQUIRED_PACKAGES: $REQUIRED_PACKAGES"
     echo "REQUIRED_PACKAGES_PLUS: $REQUIRED_PACKAGES_PLUS"
 
+# install rstudion/httpuv to enable compatibility with google cloud run https://github.com/rstudio/shiny/issues/2455
+Rscript -e "if(! 'httpuv' %in% c( installed.packages()[,'Package'])) remotes::install_github(c('rstudio/httpuv'))"
 
 if [[ $REQUIRED_PACKAGES_PLUS == *"mongolite"* || $REQUIRED_PACKAGES == *"mongolite"* ]] ; then
-	## Old version required for Azure connections
+	## Old version of mongolite required for wire protocol 2 to support Azure Cosmos DB connections
 	apt-get update -qq && apt-get -y install libsasl2-dev
-	Rscript -e "install.packages('mongolite', repos = 'https://cran.microsoft.com/snapshot/2018-08-01')"
+	Rscript -e "if(! 'mongolite' %in% c( installed.packages()[,'Package'])) install.packages('mongolite', repos = 'https://cran.microsoft.com/snapshot/2018-08-01')"
 fi
 
 if [ "$DISCOVER_PACKAGES" = "true" ] || [ "$DISCOVER_PACKAGES" = "TRUE" ] || [ "$DISCOVER_PACKAGES" = "1" ];
