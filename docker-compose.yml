@@ -10,8 +10,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DEPENDENCY_INSTALL: ALL
-        REQUIRED_PACKAGES: "assertthat,utf8,cli,ellipsis,fansi,lifecycle,pillar,pkgconfig,vctrs,tibble,hms,clipr"
+        SRC_IMAGE: rocker/r-ver
+        SRC_TAG: latest
+        DEPENDENCY: "FALSE"
+        DISCOVERY: "FALSE"
+        PACKAGES: shiny,rmarkdown,remotes
+        PACKAGES_PLUS: shiny,rmarkdown,remotes
     restart: always
     # Setting this to something other than 'root' will cause shiny apps not to
     # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
@@ -33,8 +37,7 @@ services:
       # Comment the lines below out for initial testing. With it commented out,
       # going to localhost:80 in one's web browser will show a "Welcome to
       # Shiny Server!" diagnostics page.
-      # - './mountpoints/apps:/srv/shiny-server'
-      # - ./mountpoints/apps:/etc/cont-init.d
-
+      # - './mountpoints/shiny_apps:/srv/shiny-server'
+      # - ./mountpoints/startup_scripts:/etc/cont-init.d
 volumes:
   shiny_logs:

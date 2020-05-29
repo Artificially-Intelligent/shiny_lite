@@ -5,6 +5,10 @@
 echo "Github Source Branch: $SOURCE_BRANCH"
 echo "Image Name: $IMAGE_NAME"
 
+if [ -z "${BUILD_DATE}" ]; then
+  BUILD_DATE=`date -I`
+fi
+
 if [ -z "${DOCKER_REPO}" ]; then
   DOCKER_REPO=`echo $IMAGE_NAME |  sed 's/:.*//'`
 fi
@@ -38,7 +42,7 @@ echo "R Packages to be installed along with dependencies and suggestions: $REQUI
 echo "Source Docker Image: $SOURCE_IMAGE:$SOURCE_TAG"
 
 docker build --build-arg VCS_REF=`git rev-parse --short HEAD` \
-  --build-arg VERSION=0.1 \
+  --build-arg BLD_DATE=$BUILD_DATE \
   --build-arg DEST_IMAGE=$IMAGE_NAME \
   --build-arg SRC_REPO=$SOURCE_REPO \
   --build-arg SRC_BRANCH=$SOURCE_BRANCH \
