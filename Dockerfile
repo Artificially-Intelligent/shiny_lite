@@ -70,6 +70,8 @@ ARG SHINY_DIR=/srv/shiny-server
 ENV WWW_DIR=$SHINY_DIR
 ENV LOG_DIR=/var/log/shiny-server
 ENV LIB_DIR=/usr/local/lib/shiny-server
+ENV PUID=shiny
+ENV PGID=shiny
 
 RUN rm -r $WWW_DIR \
 	&& rm /etc/shiny-server/* \
