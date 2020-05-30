@@ -45,10 +45,10 @@ RUN apt-get update && apt-get install -y \
 
 ARG BLD_DATE
 ARG MAINTAINER=slink42
-ARG $SRC_REPO=Artificially-Intelligent/shiny_lite
-ARG $SRC_BRANCH=master
-ARG $SRC_COMMIT=XXXXXXXX
-ARG $DEST_IMAGE=ArtificiallyIntelligent/shiny_lite
+ARG SRC_REPO=Artificially-Intelligent/shiny_lite
+ARG SRC_BRANCH=master
+ARG SRC_COMMIT=XXXXXXXX
+ARG DEST_IMAGE="ArtificiallyIntelligent/shiny_lite"
 
 ENV SOURCE_DOCKER_IMAGE=$SRC_IMAGE:$SRC_TAG
 ENV SOURCE_REPO=$SRC_REPO
@@ -62,8 +62,7 @@ LABEL build_version="$DOCKER_IMAGE version:- ${VERSION} Build-date:- ${SHINY_BUI
 LABEL build_source="$SOURCE_BRANCH - https://github.com/${SOURCE_REPO}/commit/${SOURCE_COMMIT}"
 LABEL maintainer="$MAINTAINER"
 
-# add shiny server custom scripts
-ADD shiny-server /usr/local/lib/shiny-server
+
 
 ## create directories for mounting shiny app code
 ARG SHINY_DIR=/srv/shiny-server
@@ -77,7 +76,13 @@ RUN rm -r $WWW_DIR \
 	&& rm /etc/shiny-server/* \
 	&& mkdir -p $WWW_DIR \
  	&& mkdir -p $LOG_DIR \
-	&& chown $PUID.$PGID -R $WWW_DIR
+	&& mkdir -p $LIB_DIR \
+	&& chown $PUID.$PGID -R $WWW_DIR \
+	&& chown $PUID.$PGID -R $LIB_DIR \
+	&& chown $PUID.$PGID -R $LOG_DIR
+
+# add shiny server custom scripts
+ADD shiny-server $LIB_DIR
 
 ## install package dependcies
 # DISCOVERY=TRUE to try and discover packages required you code in $WWW_DIR
