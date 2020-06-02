@@ -51,7 +51,7 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",zzzzz,"* ]] &
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libsqlite3-dev "; 
     echo "adding dependencies for tba"
 fi
-if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",zzzzz,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
+if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",sf,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libpq-dev "; 
     echo "adding dependencies for tba"
 fi
@@ -84,7 +84,7 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",sf,"* ]] && [
     echo "sf"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL_CONFLICT" || $ALL_REQUIRED_PACKAGES == *",RMySQL,"* ]]  && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev-compat "; 
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev-compat libmariadbclient-dev "; 
     echo "adding dependencies for RMySQL"
 fi
 

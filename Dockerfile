@@ -8,11 +8,19 @@ RUN apt-get update && apt-get install -y \
     gdebi-core \
     pandoc \
     pandoc-citeproc \
-    libcurl4-gnutls-dev \
+#    libcurl4-gnutls-dev \
     libcairo2-dev \
     libxt-dev \
 	libv8-dev \
 	libxml2-dev \
+  libsqlite3-dev \
+  libmariadbd-dev \
+  libmariadbclient-dev \
+  libpq-dev \
+  libssl-dev \
+  libcurl4-openssl-dev \
+  libssh2-1-dev \
+  unixodbc-dev \
     xtail \
     wget \
  	gosu \
@@ -34,6 +42,7 @@ RUN apt-get update && apt-get install -y \
     --deps TRUE \
     --skipinstalled \
 	--ncpus -1 \
+    remotes \
 	shiny \
 	rmarkdown \
 	remotes \

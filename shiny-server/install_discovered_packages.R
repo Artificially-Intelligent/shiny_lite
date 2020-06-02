@@ -143,6 +143,9 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
   packages_to_install <- unique(c(default_packages, required_packages, discovered_packages, prev_failed_packages))
   packages_to_install <- packages_to_install[!(packages_to_install %in% installed.packages()[,"Package"])]
   
+  # shift custom packages to the front of the list
+  packages_to_install <- c(packages_to_install[(packages_to_install %in% c(custom_package_repos$package, custom_package_sources))], 
+                           packages_to_install[! (packages_to_install %in% c(custom_package_repos$package, custom_package_sources))])
   failed_packages <- c()
   if(length(packages_to_install)>0){
     print(paste("Packages to be installed (", paste(packages_to_install, collapse = ",")   , ")" ,sep = ""))
