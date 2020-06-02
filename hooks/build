@@ -24,6 +24,9 @@ fi
 
 if [ -z "${SOURCE_TAG}" ]; then
   SOURCE_TAG=`echo $IMAGE_NAME | sed -n 's/^.*\://p'`
+	if [ "${SOURCE_TAG}" == "latest" ]; then
+		SOURCE_TAG=3.6.3
+	fi
 fi
 
 if [ -z "${PACKAGE_LIST}" ]; then

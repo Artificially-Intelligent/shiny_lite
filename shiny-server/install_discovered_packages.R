@@ -1,16 +1,18 @@
 list.of.packages <- c(
   "readr",
   "stringr",
-  "packrat"
+  # "packrat",
+  "devtools"
 )
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)){
   print(paste('Installing packages needed for package discovery R script:', new.packages, collapse = ' '))
   install.packages(new.packages, quiet = TRUE)
-} 
+}
 library(readr);
 library(stringr);
+library(devtools);
 
 packrat_snapshot <- function(project = Sys.getenv('WWW_DIR')){
   packrat::snapshot( project = project)
@@ -19,7 +21,36 @@ packrat_snapshot <- function(project = Sys.getenv('WWW_DIR')){
 discover_and_install <- function(default_packages_csv = '/no/file/selected', 
                                  discovery_directory_root = '/srv/shiny-server/www', 
                                  discovery = FALSE, repos = 'https://cran.rstudio.com/'){
+  
+  # list of custom sources to use for remotes::install_github installs
+  if(nchar(Sys.getenv('CUSTOM_PACKAGE_SOURCES')) > 0){
+    custom_package_sources <- unique(str_split(Sys.getenv('CUSTOM_PACKAGE_SOURCES'),",")[[1]])
 
+    print(paste("Adding csv entries from ENV variable CUSTOM_PACKAGE_SOURCES as list of package source to install from if package requested : (", 
+                paste(custom_package_sources, collapse = ",") , ")",sep = ""))
+  }else{
+    custom_package_sources <- c("r-lib/xml2", 'jcheng5/bubbles', 'hadley/shinySignals', 'rstudio/httpuv')
+  }
+  
+  # list of custom sources to use for remotes::install_github installs
+  if(nchar(Sys.getenv('CUSTOM_PACKAGE_REPOS')) > 0){
+    custom_package_repos_raw <- unique(str_split(Sys.getenv('CUSTOM_PACKAGE_REPOS'),",")[[1]])
+    
+    print(paste("Adding csv entries from ENV variable CUSTOM_PACKAGE_REPOS as list of package source to install from if package requested : (", 
+                paste(custom_package_sources, collapse = ",") , ")",sep = ""))
+  }else{
+    custom_package_repos_raw <- c( "mongolite", 'https://cran.microsoft.com/snapshot/2018-08-01')
+  }
+  if(length(custom_package_repos_raw) >= 2 &  length(custom_package_repos_raw) %% 2 == 0){
+    custom_package_repos <- data.frame(package = custom_package_repos_raw[seq(1,length(custom_package_repos_raw),2)],
+                                       repo = custom_package_repos_raw[seq(2,length(custom_package_repos_raw),2)])  
+  }else{
+    custom_package_repos <- data.frame(package = character(0),
+                                       repo = character(0))  
+  }
+  
+  
+  
   oldRepos <- getOption("repos")
   options(repos = c( MRAN = repos, oldRepos))
   print(paste("Package Repos:", paste(getOption("repos"), collapse = ",")))
@@ -120,11 +151,27 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
         {
           if(length(package_name[!(package_name %in% installed.packages()[,"Package"])]) > 0){
             print(paste("Installing package: ", package_name ,sep = ""))
+            #checking for custom source
+            custom_source <- custom_package_sources[str_extract(custom_package_sources,  pattern = "\\w+$")  == package_name][1]
+            custom_repo <- custom_package_repos$repo[custom_package_repos$package == package_name][1]
+            
+            if(is.na( custom_source) & is.na(custom_repo)){
             install.packages(package_name, 
                              dependencies = TRUE,
-                             # repos = repos, 
+                             repos = repos,
                              #     method='wget',
                              quiet = TRUE)
+            }else{
+              if(! is.na( custom_source))
+                devtools::install_github(custom_source)
+              if(! is.na( custom_repo))
+                install.packages(package_name, 
+                                 dependencies = TRUE,
+                                 repos = custom_repo,
+                                 #     method='wget',
+                                 quiet = TRUE)
+            }
+            
             warnings()
             #write.table(package_name, file=installed_packages_csv, row.names=FALSE, col.names=FALSE, sep=",", append = TRUE)
           }else{

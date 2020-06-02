@@ -43,9 +43,9 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",xml2,"* ]] ||
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libxml2-dev "; 
     echo "adding dependencies for xml2"
 fi
-if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",zzzzz,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcairo2-dev libxt-dev "; 
-    echo "adding dependencies for tba"
+if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",hrbrthemes,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libcairo2-dev libxt-dev libfontconfig1-dev "; 
+    echo "adding dependencies for hrbrthemes"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",zzzzz,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libsqlite3-dev "; 
@@ -84,7 +84,7 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",sf,"* ]] && [
     echo "sf"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL_CONFLICT" || $ALL_REQUIRED_PACKAGES == *",RMySQL,"* ]]  && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev "; 
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev-compat "; 
     echo "adding dependencies for RMySQL"
 fi
 

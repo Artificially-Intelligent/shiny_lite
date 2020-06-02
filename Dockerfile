@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
     libcairo2-dev \
     libxt-dev \
+	libv8-dev \
+	libxml2-dev \
     xtail \
     wget \
  	gosu \
@@ -23,9 +25,10 @@ RUN apt-get update && apt-get install -y \
     gdebi -n ss-latest.deb && \
     rm -f version.txt ss-latest.deb && \
     . /etc/environment && \
-    R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN')" && \
-    chown shiny:shiny /var/lib/shiny-server && \
 # Download and install base level R packages required by shiny and suggested dependencies
+    R -e "install.packages(c('shiny', 'rmarkdown'), repos='$MRAN')" && \
+	# R -e "install.packages(c('remotes', 'V8','xml2'), repos='$MRAN')" && \
+    chown shiny:shiny /var/lib/shiny-server && \
 	install2.r \
 	--error \
     --deps TRUE \
@@ -33,14 +36,16 @@ RUN apt-get update && apt-get install -y \
 	--ncpus -1 \
 	shiny \
 	rmarkdown \
-	remotes && \
+	remotes \
+	V8 \
+	xml2 && \
 ## clean up install files
-	cd / && \
-	# rm -rf /tmp/* && \
-	# apt-get remove --purge -y $BUILDDEPS && \
-	apt-get autoremove -y && \
-	apt-get autoclean -y && \
-	# rm -rf /var/lib/apt/lists/* && \
+	# cd / && \
+	# # rm -rf /tmp/* && \
+	# # apt-get remove --purge -y $BUILDDEPS && \
+	# apt-get autoremove -y && \
+	# apt-get autoclean -y && \
+	# # rm -rf /var/lib/apt/lists/* && \
 	cd /
 
 ARG BLD_DATE

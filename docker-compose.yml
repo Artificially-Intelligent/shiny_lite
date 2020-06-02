@@ -11,7 +11,7 @@ services:
       dockerfile: Dockerfile
       args:
         SRC_IMAGE: rocker/r-ver
-        SRC_TAG: latest
+        SRC_TAG: 3.6.3
         DEPENDENCY: "FALSE"
         DISCOVERY: "FALSE"
         PACKAGES: shiny,rmarkdown,remotes
