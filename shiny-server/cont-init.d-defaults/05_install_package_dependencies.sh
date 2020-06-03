@@ -3,10 +3,21 @@
 if [[ $1 == "--all" || $DEPENDENCY_INSTALL == "ALL" || $DEPENDENCY_INSTALL == "TRUE" || $DEPENDENCY_INSTALL == "true" || $DEPENDENCY_INSTALL == "1" ]] ; then
     DEPENDENCY_INSTALL="ALL" 
 fi
+# Load package_depends.csv for list of packages that were identifed at dependencies of packages to
+# be installed by 04_expand_packages_dependencies.sh
+if [[ -f "${SCRIPTS_DIR}/package_depends.csv" ]] ; then  
+    export PACKAGES_DEPENDS=`cat ${SCRIPTS_DIR}/package_depends.csv`
+fi
+# Load failed_packages.csv for list of packages that failed to install in a prior call to 06_install_packages.sh
+if [[ -f "${SCRIPTS_DIR}/failed_packages.csv" ]] ; then  
+    export FAILED_PACKAGES=`cat ${SCRIPTS_DIR}/failed_packages.csv`
+fi
 
-ALL_REQUIRED_PACKAGES=",$REQUIRED_PACKAGES,$REQUIRED_PACKAGES_PLUS,$FAILED_PACKAGES,"
+ALL_REQUIRED_PACKAGES=",$REQUIRED_PACKAGES,$REQUIRED_PACKAGES_PLUS,$FAILED_PACKAGES,$PACKAGES_DEPENDS,"
 
-if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",protolite,"* || $ALL_REQUIRED_PACKAGES == *",geojson,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then  
+echo "Packages checking for dependecy requirements: $ALL_REQUIRED_PACKAGES"
+
+if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",protolite,"* || $ALL_REQUIRED_PACKAGES == *",geojson,"* || $ALL_REQUIRED_PACKAGES == *",geojsonio,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then  
     PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libprotobuf-dev protobuf-compiler "
     echo "adding dependencies for protolite"
 fi
@@ -14,7 +25,8 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",magick,"* ]] 
     PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmagick++-dev "
     echo "adding dependencies for magick"
 fi;
-if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",V8,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then 
+
+if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",V8,"* || $ALL_REQUIRED_PACKAGES == *",geojsonio,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then 
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libnode-dev libv8-dev "
     echo "adding dependencies for V8"
 fi 
@@ -31,7 +43,7 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",summarytools,
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev "
     echo "adding dependencies for units"
 fi
-if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",jqr,"* || $ALL_REQUIRED_PACKAGES == *",geojson,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then 
+if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",jqr,"* || $ALL_REQUIRED_PACKAGES == *",geojson,"* || $ALL_REQUIRED_PACKAGES == *",geojsonio,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then 
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libjq-dev "
     echo "adding dependencies for jqr"
 fi
@@ -53,7 +65,7 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",zzzzz,"* ]] &
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",sf,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libpq-dev "; 
-    echo "adding dependencies for tba"
+    echo "adding dependencies for sf"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",zzzzz,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libssh2-1-dev "; 
@@ -80,10 +92,10 @@ if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",mongolite,"* 
     echo "adding dependencies for mongolite"
 fi
 if [[ $DEPENDENCY_INSTALL == "ALL" || $ALL_REQUIRED_PACKAGES == *",sf,"* ]] && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
-   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev libgdal-dev gdal-bin libproj-dev proj-data proj-bin libgeos-dev default-libmysqlclient-dev libmariadb-dev-compat"; 
+   PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libudunits2-dev libgdal-dev gdal-bin libproj-dev proj-data proj-bin libgeos-dev libmariadbclient-dev-compat libmariadbclient-dev "; 
     echo "sf"
 fi
-if [[ $DEPENDENCY_INSTALL == "ALL_CONFLICT" || $ALL_REQUIRED_PACKAGES == *",RMySQL,"* ]]  && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
+if [[ $DEPENDENCY_INSTALL == "ALL_CONFLICT" || $ALL_REQUIRED_PACKAGES == *",RMySQL,"* || $ALL_REQUIRED_PACKAGES == *",DBI,"* ]]  && [[ $DEPENDENCY_INSTALL != "NONE" ]] ; then
    PACKAGE_DEPENDENCIES="$PACKAGE_DEPENDENCIES libmariadbclient-dev-compat libmariadbclient-dev "; 
     echo "adding dependencies for RMySQL"
 fi

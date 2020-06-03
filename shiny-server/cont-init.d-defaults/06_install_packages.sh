@@ -28,8 +28,8 @@ then
     # install packages specified by /etc/shiny-server/default_install_packages.csv or REQUIRED_PACKAGES
     # or those discovered  by a scan of files in $WWW_DIR looking for library('packagename') entries
 	echo 
-	Rscript -e "source('${LIB_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${LIB_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = TRUE,repos='$MRAN');"
+	Rscript -e "source('${SCRIPTS_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${SCRIPTS_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = TRUE,repos='$MRAN');"
 else
     # install packages specified by /etc/shiny-server/default_install_packages.csv or REQUIRED_PACKAGES
-	Rscript -e "source('${LIB_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${LIB_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = FALSE,repos='$MRAN');"
+	Rscript -e "source('${SCRIPTS_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${SCRIPTS_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = FALSE,repos='$MRAN');"
 fi

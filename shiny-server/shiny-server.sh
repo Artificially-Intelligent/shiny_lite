@@ -23,15 +23,15 @@ export SHINY_GROUP=shiny
 
 # if config dir is empty copy file there for use in cont-init.d scripts
 if [ -z "$(ls -A -- "/etc/shiny-server/")" ]; then
-    cp ${LIB_DIR}/default_install_packages.csv /etc/shiny-server/default_install_packages.csv
-    cp ${LIB_DIR}/template-shiny-server.conf /etc/shiny-server/template-shiny-server.conf
+    cp ${SCRIPTS_DIR}/default_install_packages.csv /etc/shiny-server/default_install_packages.csv
+    cp ${SCRIPTS_DIR}/template-shiny-server.conf /etc/shiny-server/template-shiny-server.conf
 fi
 
 # Run init scripts
 mkdir -p /etc/cont-init.d/
 if [ -z "$(ls -A -- "/etc/cont-init.d/")" ]; then
     echo "Default startup scripts copied to emply dir /etc/cont-init.d/"
-    cp ${LIB_DIR}/cont-init.d-defaults/* /etc/cont-init.d/
+    cp ${SCRIPTS_DIR}/cont-init.d-defaults/* /etc/cont-init.d/
 fi
 
 chmod +700 -R /etc/cont-init.d/

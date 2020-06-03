@@ -19,7 +19,7 @@ packrat_snapshot <- function(project = Sys.getenv('WWW_DIR')){
 }
 
 discover_and_install <- function(default_packages_csv = '/no/file/selected', 
-                                 discovery_directory_root = '/srv/shiny-server/www', 
+                                 discovery_directory_root = '/srv/shiny-server', 
                                  discovery = FALSE, repos = 'https://cran.rstudio.com/'){
   
   # list of custom sources to use for remotes::install_github installs
@@ -29,7 +29,7 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
     print(paste("Adding csv entries from ENV variable CUSTOM_PACKAGE_SOURCES as list of package source to install from if package requested : (", 
                 paste(custom_package_sources, collapse = ",") , ")",sep = ""))
   }else{
-    custom_package_sources <- c("r-lib/xml2", 'jcheng5/bubbles', 'hadley/shinySignals', 'rstudio/httpuv')
+    custom_package_sources <- c('jcheng5/bubbles', 'hadley/shinySignals', 'rstudio/httpuv')
   }
   
   # list of custom sources to use for remotes::install_github installs
@@ -80,12 +80,13 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
   }
   
   if(nchar(Sys.getenv('REQUIRED_PACKAGES_PLUS')) > 0){
-    required_packages <- unique(c(
-      required_packages,
+    required_packages_plus <- unique(c(
       str_split(Sys.getenv('REQUIRED_PACKAGES_PLUS'),",")[[1]]
     ))
     print(paste("Adding csv entries from ENV variable REQUIRED_PACKAGES_PLUS to list of packages to install: (", 
-                paste(required_packages, collapse = ",") , ")",sep = ""))
+                paste(required_packages_plus, collapse = ",") , ")",sep = ""))
+  }else{
+    required_packages_plus <- c()
   }
   
   # default_packages_csv_path <- strsplit(default_packages_csv, "/")
@@ -141,17 +142,40 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
   }
   
   packages_to_install <- unique(c(default_packages, required_packages, discovered_packages, prev_failed_packages))
-  packages_to_install <- packages_to_install[!(packages_to_install %in% installed.packages()[,"Package"])]
+  if(length(packages_to_install)>0){
+    install_list <- data.frame(package_name = packages_to_install,
+                               install_dependencies = FALSE)
+  }else{
+    install_list <- data.frame(package_name = character(0),
+               install_dependencies = character(0))
+    
+  }
+  if(length(required_packages_plus) > 0){
+    install_list <- rbind(install_list,
+                          data.frame(package_name = required_packages_plus,
+                               install_dependencies = TRUE)
+    )
+  }
+  
+  
+  install_list <- install_list[! install_list$package_name %in% installed.packages()[,"Package"],]
+                        
+  # packages_to_install <- packages_to_install[!(packages_to_install %in% installed.packages()[,"Package"])]
   
   # shift custom packages to the front of the list
-  packages_to_install <- c(packages_to_install[(packages_to_install %in% c(custom_package_repos$package, custom_package_sources))], 
-                           packages_to_install[! (packages_to_install %in% c(custom_package_repos$package, custom_package_sources))])
+  # packages_to_install <- c(packages_to_install[(packages_to_install %in% c(custom_package_repos$package, custom_package_sources))],
+  #                          packages_to_install[! (packages_to_install %in% c(custom_package_repos$package, custom_package_sources))])
   failed_packages <- c()
-  if(length(packages_to_install)>0){
+  if(length(install_list)>0){
     print(paste("Packages to be installed (", paste(packages_to_install, collapse = ",")   , ")" ,sep = ""))
-    for(package_name in packages_to_install){
+    
+    for(i in 1:nrow(install_list)){
+      package <- install_list[i,]
+      package_name <- package$package_name
+      install_dependencies <- package$install_dependencies
       tryCatch(
         {
+          
           if(length(package_name[!(package_name %in% installed.packages()[,"Package"])]) > 0){
             print(paste("Installing package: ", package_name ,sep = ""))
             #checking for custom source
@@ -160,7 +184,7 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
             
             if(is.na( custom_source) & is.na(custom_repo)){
             install.packages(package_name, 
-                             dependencies = TRUE,
+                             dependencies = install_dependencies,
                              repos = repos,
                              #     method='wget',
                              quiet = TRUE)
@@ -169,12 +193,11 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
                 devtools::install_github(custom_source)
               if(! is.na( custom_repo))
                 install.packages(package_name, 
-                                 dependencies = TRUE,
+                                 dependencies = install_dependencies,
                                  repos = custom_repo,
                                  #     method='wget',
                                  quiet = TRUE)
             }
-            
             warnings()
             #write.table(package_name, file=installed_packages_csv, row.names=FALSE, col.names=FALSE, sep=",", append = TRUE)
           }else{
@@ -196,7 +219,16 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
   print(paste("Installed packages:",paste(installed.packages()[,"Package"],collapse = ",")))
   if(length(failed_packages) > 0){
     print(paste("Packages that failed to install:",paste(failed_packages,collapse = ",")))
-    # Write falied package list to env variable
-    Sys.setenv(FAILED_PACKAGES = paste( unique(failed_packages),collapse = ","))
+    # Write falied package list to file
+    write.table(
+      depends_csv,
+      sep = ",",
+      file = file.path(Sys.getenv('SCRIPTS_DIR'), 'failed_packages.csv'),
+      col.names = FALSE,
+      row.names = FALSE,
+      quote = FALSE
+    )
   }
 }
+
+discover_and_install()
