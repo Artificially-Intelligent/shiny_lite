@@ -29,7 +29,7 @@ package_list <-
     Sys.getenv('REQUIRED_PACKAGES'),
     Sys.getenv('REQUIRED_PACKAGES_PLUS')
   ))
-package_list = 'ggplot2'
+
 package_list <- package_list[nchar(package_list) > 0]
 if (length(package_list) > 0) {
   pack <- available.packages()
