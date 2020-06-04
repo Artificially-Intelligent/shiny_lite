@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 if [ -z "${SHINY_APP_INIT_TIMEOUT}" ]; then
     echo "SHINY_APP_INIT_TIMEOUT not specified, shiny server run using default value: 60"

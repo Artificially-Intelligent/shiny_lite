@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 if [ ! -z "${SHINYCODE_GITHUB_REPO}" ];
 then

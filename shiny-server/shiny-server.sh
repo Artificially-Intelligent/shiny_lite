@@ -17,6 +17,7 @@ export SHINY_GROUP=shiny
 #    echo "PGID not specified, shiny server run as default value: 1000"
 #    export PGID=1000
 #fi
+#
 
 ## Create non root user to run shinyserver 
 #groupadd -r --gid $PGID shinyserver && useradd --no-log-init -r -g $PGID -u $PUID shinyserver

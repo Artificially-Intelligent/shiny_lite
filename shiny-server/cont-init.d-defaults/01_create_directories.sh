@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 if [ -z "${WWW_DIR}" ]; then
     echo "WWW_DIR not specified, shiny server run as default value: /srv/shiny-server/www"

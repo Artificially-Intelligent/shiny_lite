@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 if [[ $1 == "--all" || $DEPENDENCY_INSTALL == "ALL" || $DEPENDENCY_INSTALL == "TRUE" || $DEPENDENCY_INSTALL == "true" || $DEPENDENCY_INSTALL == "1" ]] ; then
     DEPENDENCY_INSTALL="ALL" 

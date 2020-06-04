@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # Installs pacakges in ENV variable REQUIRED_PACKAGES and if DISCOVER_PACKAGES=true any packages refrenced in R code in $WWW_DIR
 
