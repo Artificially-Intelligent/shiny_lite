@@ -1,5 +1,5 @@
 # Base image https://hub.docker.com/u/rocker/
-ARG SRC_TAG=latest
+ARG SRC_TAG=3.6.3
 ARG SRC_IMAGE=rocker/r-ver
 FROM $SRC_IMAGE:$SRC_TAG
 
@@ -48,6 +48,9 @@ RUN wget --no-verbose https://download3.rstudio.org/ubuntu-14.04/x86_64/VERSION 
 		--ncpus -1 \
 		shiny \
 		rmarkdown \
+        devtools \
+        readr \
+        stringr \
 	&& rm -rf /tmp/downloaded_packages
 
 ARG BLD_DATE

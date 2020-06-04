@@ -23,13 +23,17 @@ fi
 # 	Rscript -e "if(! 'mongolite' %in% c( installed.packages()[,'Package'])) install.packages('mongolite', repos = 'https://cran.microsoft.com/snapshot/2018-08-01')"
 # fi
 
+if [[ -f "${SCRIPTS_DIR}/failed_packages.csv" ]] ; then  
+    export FAILED_PACKAGES=`cat ${SCRIPTS_DIR}/failed_packages.csv`
+fi
+
 if [ "$DISCOVER_PACKAGES" = "true" ] || [ "$DISCOVER_PACKAGES" = "TRUE" ] || [ "$DISCOVER_PACKAGES" = "1" ];
 then
     # install packages specified by /etc/shiny-server/default_install_packages.csv or REQUIRED_PACKAGES
     # or those discovered  by a scan of files in $WWW_DIR looking for library('packagename') entries
 	echo 
-	Rscript -e "source('${SCRIPTS_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${SCRIPTS_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = TRUE,repos='$MRAN');"
+	Rscript -e "source('${SCRIPTS_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${SCRIPTS_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = TRUE, new_repos='$MRAN');"
 else
     # install packages specified by /etc/shiny-server/default_install_packages.csv or REQUIRED_PACKAGES
-	Rscript -e "source('${SCRIPTS_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${SCRIPTS_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = FALSE,repos='$MRAN');"
+	Rscript -e "source('${SCRIPTS_DIR}/install_discovered_packages.R'); discover_and_install(default_packages_csv = '${SCRIPTS_DIR}/default_install_packages.csv', discovery_directory_root = '$WWW_DIR', discovery = FALSE, new_repos='$MRAN');"
 fi

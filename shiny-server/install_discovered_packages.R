@@ -1,7 +1,6 @@
 list.of.packages <- c(
   "readr",
   "stringr",
-  # "packrat",
   "devtools"
 )
 
@@ -14,18 +13,14 @@ library(readr);
 library(stringr);
 library(devtools);
 
-packrat_snapshot <- function(project = Sys.getenv('WWW_DIR')){
-  packrat::snapshot( project = project)
-}
-
 discover_and_install <- function(default_packages_csv = '/no/file/selected', 
                                  discovery_directory_root = '/srv/shiny-server', 
-                                 discovery = FALSE, repos = 'https://cran.rstudio.com/'){
+                                 discovery = FALSE, new_repos = 'https://mran.microsoft.com/'){
   
   # list of custom sources to use for remotes::install_github installs
   if(nchar(Sys.getenv('CUSTOM_PACKAGE_SOURCES')) > 0){
     custom_package_sources <- unique(str_split(Sys.getenv('CUSTOM_PACKAGE_SOURCES'),",")[[1]])
-
+    
     print(paste("Adding csv entries from ENV variable CUSTOM_PACKAGE_SOURCES as list of package source to install from if package requested : (", 
                 paste(custom_package_sources, collapse = ",") , ")",sep = ""))
   }else{
@@ -50,9 +45,8 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
   }
   
   
-  
-  oldRepos <- getOption("repos")
-  options(repos = c( MRAN = repos, oldRepos))
+  old_repos <- getOption("repos")
+  options(repos = c( MRAN = new_repos, old_repos))
   print(paste("Package Repos:", paste(getOption("repos"), collapse = ",")))
   
   default_packages <- c()
@@ -71,10 +65,15 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
     required_packages <- c()
   }
   
-  if(nchar(Sys.getenv('FAILED_PACKAGES')) > 0){
-    prev_failed_packages <- unique(str_split(Sys.getenv('FAILED_PACKAGES'),",")[[1]])
-    print(paste("Adding csv entries from ENV variable FAILED_PACKAGES to list of packages to install: (", 
+  failed_csv <- file.path(Sys.getenv('SCRIPTS_DIR'), 'failed_packages.csv')
+  if(file.exists(failed_csv)){
+    prev_failed_packages <- unique(unlist(str_split(paste(collapse = ',',unlist(read.csv2(failed_csv, header = FALSE))),",")))
+    print(paste("Adding csv entries from",failed_csv ,"to list of packages to install: (", 
                 paste(prev_failed_packages, collapse = ",") , ")",sep = ""))
+    
+    # prev_failed_packages <- unique(str_split(Sys.getenv('FAILED_PACKAGES'),",")[[1]])
+    # print(paste("Adding csv entries from ENV variable FAILED_PACKAGES to list of packages to install: (", 
+    #             paste(prev_failed_packages, collapse = ",") , ")",sep = ""))
   }else{
     prev_failed_packages <- c()
   }
@@ -95,7 +94,6 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
   discovered_packages <- c()
   if(discovery){
     print("Runnning package discovery")
-    # packrat::snapshot( project = Sys.getenv('WWW_DIR'))
     
     r_files <- list.files(path = discovery_directory_root, pattern = "*.R$", recursive = TRUE,full.names = TRUE)
     
@@ -111,117 +109,121 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
       if(length(lines)>0){
         
         # find packages referenced via library() command
-        libraries <- gsub(' ','',lines[grepl('^library\\(',gsub(' ','',lines))])
-        libraries <- gsub("'",'',gsub('"','',gsub("\\).*","",libraries)))
-        libraries <- unlist(strsplit(libraries, split="[()]"))
-        libraries <- unique(libraries[!grepl('library|;',libraries)])
+        libraries_list <- gsub(' ','',lines[grepl('^library\\(',gsub(' ','',lines))])
+        libraries_list <- gsub("'",'',gsub('"','',gsub("\\).*","",libraries_list)))
+        libraries_list <- unlist(strsplit(libraries_list, split="[()]"))
+        libraries_list <- unique(libraries_list[!grepl('library|;',libraries_list)])
         
         # find packages referenced via :: command
-        libraries <- c(libraries,
+        libraries_list <- c(libraries_list,
                        gsub("\\::.*","",lines[grepl('::',lines)])
         )
         
         # remove anything prior to a , "' character
-        libraries <- unique(
+        libraries_list <- unique(
           gsub(".*\\(","",
                gsub(".*,","",
                     gsub(".* ","",
-                         libraries
+                         libraries_list
                     )
                )
           )
         )
       }
       
-      if(length(libraries)>0){
-        print(paste("Packages found in", file , "(", paste(libraries, collapse = ",") , ")"))
-        discovered_packages <- unique(c(libraries,discovered_packages))
+      if(length(libraries_list)>0){
+        print(paste("Packages found in", file , "(", paste(libraries_list, collapse = ",") , ")"))
+        discovered_packages <- unique(c(libraries_list,discovered_packages))
       }
     }
     print(paste("Packages discovered in *.R files: (", paste(discovered_packages, collapse = ",") , ")",sep = ""))
   }
   
-  packages_to_install <- unique(c(default_packages, required_packages, discovered_packages, prev_failed_packages))
-  if(length(packages_to_install)>0){
-    install_list <- data.frame(package_name = packages_to_install,
-                               install_dependencies = FALSE)
-  }else{
-    install_list <- data.frame(package_name = character(0),
-               install_dependencies = character(0))
-    
-  }
-  if(length(required_packages_plus) > 0){
-    install_list <- rbind(install_list,
-                          data.frame(package_name = required_packages_plus,
-                               install_dependencies = TRUE)
-    )
-  }
+  install_list <- data.frame(package_name = unique(c(default_packages, required_packages, discovered_packages, prev_failed_packages,required_packages_plus)))
   
+  install_list$install_dependencies <- install_list$package_name %in% required_packages_plus
+  install_list$verbose <- install_list$package_name %in% prev_failed_packages
   
   install_list <- install_list[! install_list$package_name %in% installed.packages()[,"Package"],]
-                        
+  
   # packages_to_install <- packages_to_install[!(packages_to_install %in% installed.packages()[,"Package"])]
   
   # shift custom packages to the front of the list
   # packages_to_install <- c(packages_to_install[(packages_to_install %in% c(custom_package_repos$package, custom_package_sources))],
   #                          packages_to_install[! (packages_to_install %in% c(custom_package_repos$package, custom_package_sources))])
   failed_packages <- c()
-  if(length(install_list)>0){
-    print(paste("Packages to be installed (", paste(packages_to_install, collapse = ",")   , ")" ,sep = ""))
+  if(nrow(install_list)>0){
+    print(paste("Packages to be installed (", paste(install_list$package_name, collapse = ",")   , ")" ,sep = ""))
     
     for(i in 1:nrow(install_list)){
-      package <- install_list[i,]
-      package_name <- package$package_name
-      install_dependencies <- package$install_dependencies
+      current_package <- install_list[i,]
+      current_package_name <- as.character(current_package$package_name)
+      if(current_package$install_dependencies){
+        current_package_install_dependencies <- TRUE
+      }else{
+        current_package_install_dependencies <- NA
+      }
+      
+      quiet_install <- ! current_package$verbose
+      # quiet_install <- FALSE
       tryCatch(
         {
           
-          if(length(package_name[!(package_name %in% installed.packages()[,"Package"])]) > 0){
-            print(paste("Installing package: ", package_name ,sep = ""))
+          if(length(current_package_name[!(current_package_name %in% installed.packages()[,"Package"])]) > 0){
+            print(paste("Installing package: '", current_package_name , "'" ,sep = ""))
+            print(paste("Dependency Options:",paste(current_package_install_dependencies,collapse = ",")))
+            
             #checking for custom source
-            custom_source <- custom_package_sources[str_extract(custom_package_sources,  pattern = "\\w+$")  == package_name][1]
-            custom_repo <- custom_package_repos$repo[custom_package_repos$package == package_name][1]
+            custom_source <- as.character(custom_package_sources[str_extract(custom_package_sources,  pattern = "\\w+$")  == current_package_name][1])
+            custom_repo <- as.character(custom_package_repos$repo[custom_package_repos$package == current_package_name][1])
             
             if(is.na( custom_source) & is.na(custom_repo)){
-            install.packages(package_name, 
-                             dependencies = install_dependencies,
-                             repos = repos,
-                             #     method='wget',
-                             quiet = TRUE)
+              print(paste("Source:",paste(getOption('repos'),collapse = ",")))
+              install.packages(current_package_name,
+                               dependencies = current_package_install_dependencies,
+                               # repos = new_repos,
+                               # method='wget',
+                               quiet = quiet_install
+                               )
             }else{
               if(! is.na( custom_source))
+                print(paste("Source: github repo",custom_source))
                 devtools::install_github(custom_source)
               if(! is.na( custom_repo))
-                install.packages(package_name, 
-                                 dependencies = install_dependencies,
+                print(paste("Source:", custom_repo))
+               install.packages(current_package_name, 
+                                 dependencies = current_package_install_dependencies,
                                  repos = custom_repo,
                                  #     method='wget',
-                                 quiet = TRUE)
+                                 quiet = quiet_install)
             }
-            warnings()
-            #write.table(package_name, file=installed_packages_csv, row.names=FALSE, col.names=FALSE, sep=",", append = TRUE)
+            # warnings()
+            #write.table(current_package_name, file=installed_packages_csv, row.names=FALSE, col.names=FALSE, sep=",", append = TRUE)
           }else{
-            print(paste("Skipping previously installed package: ", package_name ,sep = ""))
+            print(paste("Skipping previously installed package: ", current_package_name ,sep = ""))
           }
         }, 
         error=function(cond) {
-          failed_packages <- c(failed_packages,package_name)
-          message(paste("Failed to install:", package_name))
+          failed_packages <- c(failed_packages,current_package_name)
+          message(paste("Failed to install:", current_package_name))
           message("Here's the original error message:")
           message(cond)
         }
-        
       )
     }
   }else{
     print("There are no packages to be installed")
   }
-  print(paste("Installed packages:",paste(installed.packages()[,"Package"],collapse = ",")))
+  
+  installed_packages <- installed.packages()[,"Package"]
+  print(paste("Installed packages:",paste(installed_packages,collapse = ",")))
+  failed_packages <- install_list$package_name[!install_list$package_name %in% installed_packages]
+  
   if(length(failed_packages) > 0){
     print(paste("Packages that failed to install:",paste(failed_packages,collapse = ",")))
     # Write falied package list to file
     write.table(
-      depends_csv,
+      paste(failed_packages,collapse = ","),
       sep = ",",
       file = file.path(Sys.getenv('SCRIPTS_DIR'), 'failed_packages.csv'),
       col.names = FALSE,
@@ -230,5 +232,3 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
     )
   }
 }
-
-discover_and_install()

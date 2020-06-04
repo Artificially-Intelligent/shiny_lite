@@ -14,8 +14,8 @@ services:
         SRC_TAG: 3.6.3
         DEPENDENCY: "FALSE"
         DISCOVERY: "FALSE"
-        PACKAGES: shiny,rmarkdown,remotes
-        PACKAGES_PLUS: shiny,rmarkdown,remotes
+        PACKAGES: shiny,rmarkdown
+        PACKAGES_PLUS:
     restart: always
     # Setting this to something other than 'root' will cause shiny apps not to
     # run on the localhost:80 "Welcome to Shiny" diagnostics page mentioned
