@@ -186,16 +186,20 @@ discover_and_install <- function(default_packages_csv = '/no/file/selected',
                                quiet = quiet_install
                                )
             }else{
-              if(! is.na( custom_source))
+              if(! is.na( custom_source)){
                 print(paste("Source: github repo",custom_source))
                 devtools::install_github(custom_source)
-              if(! is.na( custom_repo))
+              }
+              if(! is.na( custom_repo)){
                 print(paste("Source:", custom_repo))
                install.packages(current_package_name, 
                                  dependencies = current_package_install_dependencies,
-                                 repos = custom_repo,
+                                 repos = custom_repo
+                                 # ,
                                  #     method='wget',
-                                 quiet = quiet_install)
+                                 # quiet = quiet_install
+                                )
+              }
             }
             # warnings()
             #write.table(current_package_name, file=installed_packages_csv, row.names=FALSE, col.names=FALSE, sep=",", append = TRUE)
