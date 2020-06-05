@@ -21,7 +21,7 @@ fi
 export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY=
 if [ ! -z "${SHINY_GOOGLE_ANALYTICS_ID}" ]; then
     echo "SHINY_GOOGLE_ANALYTICS_ID specified, enabling google analytics globally using id: $SHINY_GOOGLE_ANALYTICS_ID"
-    export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY="google_analytics_id ${SHINY_GOOGLE_ANALYTICS_ID};"
+    export SHINY_GOOGLE_ANALYTICS_CONFIG_ENTRY="google_analytics_id \"${SHINY_GOOGLE_ANALYTICS_ID}\";"
 fi
 
 # if running in google cloud run disable incompatible protocols
